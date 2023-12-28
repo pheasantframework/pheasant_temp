@@ -1,6 +1,8 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/ast.dart' hide Directive;
+
 import 'package:code_builder/code_builder.dart';
+import 'package:raven_temp/builder/analyze/imports/combinators.dart';
 
 import 'functions/deps.dart';
 import 'functions/functions.dart';
@@ -11,8 +13,9 @@ import 'variables/variable_extractor_visitor.dart';
 class RavenScript {
   final List<VariableDefinition> varDef;
   final List<FunctionDeclaration> funDef;
+  final List<ImportDirective> impDef;
 
-  const RavenScript({this.varDef = const [], this.funDef = const []});
+  const RavenScript({this.varDef = const [], this.funDef = const [], this.impDef = const []});
 
   List<Field> get fields {
     return List.generate(varDef.length, (index) {
@@ -69,7 +72,19 @@ class RavenScript {
       );
     });
   }
-  
+
+  List<Directive> get imports {
+    return List.generate(impDef.length, (index) {
+      final import = impDef[index];
+      return Directive.import(
+        import.uri.toSource(),
+        as: import.prefix?.toSource(),
+        show: getShowCombinators(import),
+        hide: getHideCombinators(import)
+      )
+      ;
+    });
+  }  
 }
 
 List<VariableDefinition> extractVariable(String script) {
@@ -88,4 +103,9 @@ List<VariableDefinition> extractVariable(String script) {
 List<FunctionDeclaration> extractFunction(String script) {
   final parseResult = parseString(content: script);
   return extractFunctions(parseResult.unit);
+}
+
+List<ImportDirective> extractImports(String script) {
+  CompilationUnit newUnit = parseString(content: script).unit;
+  return newUnit.directives.whereType<ImportDirective>().toList();
 }
