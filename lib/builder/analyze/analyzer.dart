@@ -1,0 +1,91 @@
+import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/ast/ast.dart';
+import 'package:code_builder/code_builder.dart';
+
+import 'functions/deps.dart';
+import 'functions/functions.dart';
+
+import 'variables/variable_info.dart';
+import 'variables/variable_extractor_visitor.dart';
+
+class RavenScript {
+  final List<VariableDefinition> varDef;
+  final List<FunctionDeclaration> funDef;
+
+  const RavenScript({this.varDef = const [], this.funDef = const []});
+
+  List<Field> get fields {
+    return List.generate(varDef.length, (index) {
+      final variable = varDef[index];
+      return Field((f) => f
+      ..name = "${variable.declaration.name}"
+      ..type = refer(variable.dataType)
+      ..late = variable.declaration.isLate
+      ..modifier = modifier(variable.declaration)
+      ..assignment = Code('${variable.declaration.initializer}')
+      );
+    });
+  }
+
+  List<Method> get methods {
+    return List.generate(funDef.length, (index) {
+      final function = funDef[index];
+      return Method((m) => m
+      ..name = function.name.toString()
+      ..returns = refer(function.returnType?.toSource() ?? 'dynamic')
+      ..requiredParameters.addAll(
+        List.generate(function.functionExpression.parameters?.parameters
+        .where((element) => !element.isOptional).length ?? 0, (index) {
+          final param = function.functionExpression.parameters!.parameters[index];
+          return Parameter((p) => p
+          ..name = param.name.toString()
+          ..covariant = param.covariantKeyword == null ? false : true
+          ..named = param.isNamed
+          ..required = param.requiredKeyword == null ? false : true
+          ..type = refer('${param.name?.previous}')
+          );
+        })
+      )
+      ..optionalParameters.addAll(
+        List.generate(function.functionExpression.parameters?.parameters
+        .where((element) => element.isOptional).length ?? 0, (index) {
+          final param = function.functionExpression.parameters!.parameters[index];
+          return Parameter((p) => p
+          ..name = param.name.toString()
+          ..covariant = param.covariantKeyword == null ? false : true
+          ..named = param.isNamed
+          ..defaultTo = param.childEntities.length > 2 ? Code('${param.childEntities.last}') : null
+          ..type = refer('${param.name?.previous}')
+          );
+        })
+      )
+      ..annotations.addAll(List.generate(
+        function.metadata.length, 
+        (index) => CodeExpression(Code('${function.metadata[index]}'))
+        ))
+      ..external = function.externalKeyword == null ? false : true
+      ..type = function.isGetter ? MethodType.getter : (function.isSetter ? MethodType.setter : null)
+      ..body = funBody(function)
+      );
+    });
+  }
+  
+}
+
+List<VariableDefinition> extractVariable(String script) {
+  List<VariableDefinition> outputList = [];
+  CompilationUnit newUnit = parseString(content: script).unit;
+  VariableExtractorVisitor visitor = VariableExtractorVisitor();
+
+  newUnit.declarations.forEach((element) {
+    element.accept(visitor);
+    outputList.addAll(visitor.variableList);
+    visitor = VariableExtractorVisitor();
+  });
+  return outputList;
+}
+
+List<FunctionDeclaration> extractFunction(String script) {
+  final parseResult = parseString(content: script);
+  return extractFunctions(parseResult.unit);
+}
