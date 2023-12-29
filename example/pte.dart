@@ -1,6 +1,5 @@
 import 'package:pheasant_temp/pheasant_temp.dart';
 
-
 void main() {
   print(
     renderFunc(script: """
