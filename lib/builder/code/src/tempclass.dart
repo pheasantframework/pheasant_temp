@@ -1,6 +1,6 @@
-class TempRavenRenderClass {
+class TempPheasantRenderClass {
   int number;
   String value;
 
-  TempRavenRenderClass({required this.number, required this.value});
+  TempPheasantRenderClass({required this.number, required this.value});
 }

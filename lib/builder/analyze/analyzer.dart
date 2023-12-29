@@ -12,12 +12,12 @@ import 'functions/functions.dart';
 import 'variables/variable_info.dart';
 import 'variables/variable_extractor_visitor.dart';
 
-class RavenScript {
+class PheasantScript {
   final List<VariableDefinition> varDef;
   final List<FunctionDeclaration> funDef;
   final List<ImportDirective> impDef;
 
-  const RavenScript({this.varDef = const [], this.funDef = const [], this.impDef = const []});
+  const PheasantScript({this.varDef = const [], this.funDef = const [], this.impDef = const []});
 
   List<Field> get fields {
     return List.generate(varDef.length, (index) {
@@ -92,12 +92,12 @@ class RavenScript {
     return imports.where((element) => fileExtension(element.url) != 'dart').toList();
   } 
 
-  List<Directive> dartedNonDartImports({String newExtension = '.raven.dart'}) {
+  List<Directive> dartedNonDartImports({String newExtension = '.pheasant.dart'}) {
     List<Directive> imports = nonDartImports;
     List<Directive> output = [];
     for (var element in imports) {
       DirectiveBuilder rebuild = element.toBuilder();
-      rebuild.url = rebuild.url?.replaceAll('.rave', newExtension);
+      rebuild.url = rebuild.url?.replaceAll('.phs', newExtension);
       output.add(rebuild.build());
     }
     return output;

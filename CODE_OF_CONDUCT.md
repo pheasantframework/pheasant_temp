@@ -2,7 +2,7 @@
 
 ## Overview
 
-As contributors and maintainers of The Raven Framework Template Package project, we pledge to create a respectful and inclusive environment for everyone involved. We value the participation of each member and want to ensure a positive experience for all.
+As contributors and maintainers of The Pheasant Framework Template Package project, we pledge to create a respectful and inclusive environment for everyone involved. We value the participation of each member and want to ensure a positive experience for all.
 
 ## Expected Behavior
 
@@ -39,6 +39,6 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 This code of conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org), version 2.0, available at https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
 
-For any questions or clarifications regarding this code of conduct, please contact [this email](raven@tech.nugegroup.com).
+For any questions or clarifications regarding this code of conduct, please contact [this email](pheasant@tech.nugegroup.com).
 
-Thank you for your cooperation and commitment to fostering a positive and inclusive community for The Raven Framework Template Package.
+Thank you for your cooperation and commitment to fostering a positive and inclusive community for The Pheasant Framework Template Package.

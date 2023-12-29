@@ -1,26 +1,26 @@
 // ignore_for_file: constant_identifier_names
 
-/// Base class for a Raven Attribute/Directive in a '.raven' template file
-abstract interface class RavenAttributeType {
+/// Base class for a Pheasant Attribute/Directive in a '.pheasant' template file
+abstract interface class PheasantAttributeType {
   final String name;
-  final RavenAttributeType? dependsOn;
+  final PheasantAttributeType? dependsOn;
 
-  const RavenAttributeType({required this.name, this.dependsOn});
+  const PheasantAttributeType({required this.name, this.dependsOn});
 }
 
-/// Enhanced enum class based on the base abstract [RavenAttributeType]
+/// Enhanced enum class based on the base abstract [PheasantAttributeType]
 /// 
-/// In this enum, the different kind of Attributes that can be used on a [RavenComponent] are listed out here.
-/// Each attribute type has a [name] variable, and linked attributes also have a [dependsOn] variable, which links to another [RavenAttributeType].
-/// This shows what a [RavenAttribute] is linked to.
+/// In this enum, the different kind of Attributes that can be used on a [PheasantComponent] are listed out here.
+/// Each attribute type has a [name] variable, and linked attributes also have a [dependsOn] variable, which links to another [PheasantAttributeType].
+/// This shows what a [PheasantAttribute] is linked to.
 /// 
-/// Any other attribute not listed here is therefore placed as [RavenAttribute.unknown].
-enum RavenAttribute implements RavenAttributeType {
+/// Any other attribute not listed here is therefore placed as [PheasantAttribute.unknown].
+enum PheasantAttribute implements PheasantAttributeType {
   r_await(name: 'r-await'),
   r_html(name: 'r-html'),
   r_if(name: 'r-if'),
-  r_else(name: 'r-else', dependsOn: RavenAttribute.r_if),
-  r_elseif(name: 'r-elseif', dependsOn: RavenAttribute.r_if),
+  r_else(name: 'r-else', dependsOn: PheasantAttribute.r_if),
+  r_elseif(name: 'r-elseif', dependsOn: PheasantAttribute.r_if),
   r_fetch(name: 'r-fetch'),
   r_for(name: 'r-for'),
   r_obj(name: 'r-obj'),
@@ -35,11 +35,11 @@ enum RavenAttribute implements RavenAttributeType {
   unknown(name: 'nil')
   ;
 
-  const RavenAttribute({required this.name, this.dependsOn});
+  const PheasantAttribute({required this.name, this.dependsOn});
 
   @override
   final String name;
 
   @override
-  final RavenAttributeType? dependsOn;
+  final PheasantAttributeType? dependsOn;
 }

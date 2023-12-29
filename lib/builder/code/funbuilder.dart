@@ -6,7 +6,7 @@ import '../analyze/analyzer.dart';
 import 'src/deps.dart';
 import '../../components/attributes/attr.dart';
 
-Code renderRenderFunc({RavenScript ravenScript = const RavenScript(), required String template}) {
+Code renderRenderFunc({PheasantScript pheasantScript = const PheasantScript(), required String template}) {
   String beginningFunc = '''
 
 ''';
@@ -18,19 +18,19 @@ Code renderRenderFunc({RavenScript ravenScript = const RavenScript(), required S
     beginningFunc += statement;
   }
   // Create the element 
-  // final RavenNodes = parse(template).body?.nodes;
-  final RavenHtml = parse(template).body!.children.first;
+  // final PheasantNodes = parse(template).body?.nodes;
+  final PheasantHtml = parse(template).body!.children.first;
   beginningFunc += '''
-final RavenHtml = _i0.parse(template).body!.children.first;
-final RavenText = _i0.parse(template).body?.nodes;
-_i2.Element _element = _i2.Element.tag(RavenHtml.localName);
+final PheasantHtml = _i0.parse(template).body!.children.first;
+final PheasantText = _i0.parse(template).body?.nodes;
+_i2.Element _element = _i2.Element.tag(PheasantHtml.localName);
 ''';
   // Configure the custom components
-  Map<String, String> importMap = { for (var element in ravenScript.nonDartImports) (element).as! : (element).url };
-  formatCustomComponents(importMap, template, RavenHtml);
-  // Work on raven attributes
-  Iterable<String> attrmap = RavenAttribute.values.map((e) => e.name);
-  beginningFunc = renderElement(beginningFunc, RavenHtml, attrmap, nonDartImports: importMap);
+  Map<String, String> importMap = { for (var element in pheasantScript.nonDartImports) (element).as! : (element).url };
+  formatCustomComponents(importMap, template, PheasantHtml);
+  // Work on pheasant attributes
+  Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
+  beginningFunc = renderElement(beginningFunc, PheasantHtml, attrmap, nonDartImports: importMap);
 
   // Final Line
   beginningFunc += 'return _element;';

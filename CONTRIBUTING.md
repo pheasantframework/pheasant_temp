@@ -1,12 +1,12 @@
-# Contributing to Raven Template Package
+# Contributing to Pheasant Template Package
 
-Thank you for considering contributing to The Raven Framework Template Package! We welcome contributions from the community to improve and enhance this Dart package.
+Thank you for considering contributing to The Pheasant Framework Template Package! We welcome contributions from the community to improve and enhance this Dart package.
 
 Before you get started, please take a moment to review our contribution guidelines to ensure a smooth collaboration process.
 
 ## Code of Conduct
 
-This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code. Please report any unacceptable behavior to [this email](raven@tech.nugegroup.com).
+This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code. Please report any unacceptable behavior to [this email](pheasant@tech.nugegroup.com).
 
 ## How to Contribute
 
@@ -62,4 +62,4 @@ We welcome suggestions for new features, improvements and optimizations. Please 
 
 By contributing to this project, you agree that your contributions will be licensed under the [MIT License](LICENSE).
 
-Thank you for contributing to The Raven Framework Template Package! Your efforts are greatly appreciated.
+Thank you for contributing to The Pheasant Framework Template Package! Your efforts are greatly appreciated.

@@ -1,9 +1,9 @@
 import 'dart:html';
 
-abstract class RavenTemplate {
+abstract class PheasantTemplate {
   String template;
 
-  RavenTemplate({required this.template});
+  PheasantTemplate({required this.template});
 
   Element render(String temp);
 }

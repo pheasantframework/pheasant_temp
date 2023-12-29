@@ -1,7 +1,7 @@
 import 'package:html/dom.dart';
-import 'package:raven_temp/builder/code/src/cc.dart';
+import 'src/cc.dart';
 
-void formatCustomComponents(Map<String, String> importMap, String template, Element RavenHtml) {
+void formatCustomComponents(Map<String, String> importMap, String template, Element PheasantHtml) {
   String componentName = "";
   importMap.keys.forEach((element) {
     componentName = element;
@@ -9,7 +9,7 @@ void formatCustomComponents(Map<String, String> importMap, String template, Elem
     Iterable<Match> regexMatches = regen.allMatches(template);
     regexMatches.map((e) => e[0]).forEach((el) {
       if ((el ?? '').contains('/')) {
-        serveSingleComponents(RavenHtml, componentName);
+        serveSingleComponents(PheasantHtml, componentName);
       }
     });
   });

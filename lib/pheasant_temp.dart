@@ -1,12 +1,12 @@
 
-/// Library for raven templating engine
+/// Library for pheasant templating engine
 /// 
 /// BRIEF CHANGELOG
 /// for my referencing
 /// 
-/// 0.0.1 - Created basic templating engine to render basic .raven files, with functionality for basic attributes such as: 
+/// 0.0.1 - Created basic templating engine to render basic .pheasant files, with functionality for basic attributes such as: 
 /// value interpolation
-/// rendering most basic raven attributes and values
+/// rendering most basic pheasant attributes and values
 /// simple rendering for medium to small templates 
 /// 
 /// 0.0.2 - Added support for click events (onClick, onHover, etc)
@@ -16,7 +16,7 @@
 /// 0.0.4 - Added support for markdown code, and state management
 /// 
 /// 0.0.5 - Optimizations and final/proper testing
-library raven_temp;
+library pheasant_temp;
 
 export 'components/component.dart';
 export 'builder/global.dart';

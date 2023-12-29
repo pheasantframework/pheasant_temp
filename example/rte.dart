@@ -1,11 +1,11 @@
-import 'package:raven_temp/raven_temp.dart';
+import 'package:pheasant_temp/pheasant_temp.dart';
 
 
 void main() {
   print(
     renderFunc(script: """
-import './Component.rave' as Component;
-import '../fruit/fruit.rave' as fruit;
+import './Component.phs' as Component;
+import '../fruit/fruit.phs' as fruit;
 
 var number = 9;
 
@@ -20,7 +20,7 @@ void subtractNum() {
 }
 """, template: """
 <div class="foo" r-for="var value in nums">
-  Welcome to Raven
+  Welcome to Pheasant
   <p>Hello World</p>
   <a href="#" class="fee" id="me">Click Here</a>
   <p>Aloha</p>

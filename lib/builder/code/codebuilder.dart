@@ -8,21 +8,21 @@ import '../code/funbuilder.dart';
 import '../analyze/analyzer.dart';
 
 /// Model Function to render class function code during build
-String renderFunc({required String script, required String template, String buildExtension = '.raven.dart'}) {
+String renderFunc({required String script, required String template, String buildExtension = '.pheasant.dart'}) {
   final formatter = DartFormatter(); 
   final emitter = DartEmitter.scoped();
   var item = LibraryBuilder();
   // Add necessary imports
   item.directives.add(Directive.import('package:html/parser.dart', as: '_i0'));
   item.directives.addAll(
-    RavenScript(
+    PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script),
         impDef: extractImports(script)
       ).imports.where((element) => fileExtension(element.url) == 'dart')
   );
   item.directives.addAll(
-    RavenScript(
+    PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script),
         impDef: extractImports(script)
@@ -32,15 +32,15 @@ String renderFunc({required String script, required String template, String buil
   item.body.add(
     Class((c) => c
     ..name = 'AppComponent'
-    ..extend = refer('RavenTemplate', 'package:raven/components.dart')
+    ..extend = refer('PheasantTemplate', 'package:pheasant/template.dart')
     ..methods.addAll(
-      RavenScript(
+      PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script)
       ).methods
     )
     ..fields.addAll(
-      RavenScript(
+      PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script)
       ).fields
@@ -67,7 +67,7 @@ String renderFunc({required String script, required String template, String buil
       ..docs.addAll(['  // Override function for creating an element'])
       ..body = renderRenderFunc(
         template: template, 
-        ravenScript: RavenScript(
+        pheasantScript: PheasantScript(
           varDef: extractVariable(script), 
           funDef: extractFunction(script),
           impDef: extractImports(script)

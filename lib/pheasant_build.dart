@@ -1,3 +1,3 @@
-library raven_build;
+library pheasant_build;
 
 export 'src/base.dart';

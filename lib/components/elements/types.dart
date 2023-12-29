@@ -1,6 +1,6 @@
 import '../../meta/metadata.dart';
 
-/// Enhanced Enum Set for the types of components that can be rendered in the Raven File
+/// Enhanced Enum Set for the types of components that can be rendered in the Pheasant File
 /// 
 /// Each component has a distinctive name that can be called
 enum ComponentType {
@@ -15,7 +15,7 @@ enum ComponentType {
   final String name;
 }
 
-/// Enhanced enum set for the types of basic element components that can be rendered in the Raven File.
+/// Enhanced enum set for the types of basic element components that can be rendered in the Pheasant File.
 /// These fall under [ComponentType.element].
 /// 
 /// All other component types not included here are 'custom' components and are differentiated in the [CustomComponentType] enum.
@@ -88,7 +88,7 @@ enum ElementComponentType {
 /// Enhanced enum set for all other components that are either not found in the [ElementComponentType] enum, are not comments ([ComponentType.comment]) and are not text ([ComponentType.text])
 /// They therefore represent the distinct types that fall under [ComponentType.custom].
 /// 
-/// Custom component types are either imported into the file as basic components (from a .raven file), or are web components created on the fly or on the file.
+/// Custom component types are either imported into the file as basic components (from a .pheasant file), or are web components created on the fly or on the file.
 /// Web Component types have a 'wc-' prefix, and the value of [imported] is set to false.
 /// 
 /// Any other component type not found here is therefore listed as 'undefined' and falls under [ComponentType.unknown].

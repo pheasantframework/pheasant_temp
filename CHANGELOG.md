@@ -1,4 +1,4 @@
-## 0.0.1
+## 0.1.0-alpha
 
 - Initial version.
-- Added Basic Features for Raven File Handling
+- Added Basic Features for Pheasant File Handling
