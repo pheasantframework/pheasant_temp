@@ -20,4 +20,4 @@ library raven_temp;
 
 export 'components/component.dart';
 export 'builder/global.dart';
-
+export 'meta/metadata.dart';

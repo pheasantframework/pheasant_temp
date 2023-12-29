@@ -2,7 +2,9 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
 import 'package:code_builder/code_builder.dart';
-import 'package:raven_temp/builder/analyze/imports/combinators.dart';
+
+import '../analyze/imports/combinators.dart';
+import '../analyze/imports/extension.dart';
 
 import 'functions/deps.dart';
 import 'functions/functions.dart';
@@ -77,14 +79,29 @@ class RavenScript {
     return List.generate(impDef.length, (index) {
       final import = impDef[index];
       return Directive.import(
-        import.uri.toSource(),
+        import.uri.toSource().replaceAll('\'', ''),
         as: import.prefix?.toSource(),
         show: getShowCombinators(import),
         hide: getHideCombinators(import)
       )
       ;
     });
-  }  
+  }
+
+  List<Directive> get nonDartImports {
+    return imports.where((element) => fileExtension(element.url) != 'dart').toList();
+  } 
+
+  List<Directive> dartedNonDartImports({String newExtension = '.raven.dart'}) {
+    List<Directive> imports = nonDartImports;
+    List<Directive> output = [];
+    for (var element in imports) {
+      DirectiveBuilder rebuild = element.toBuilder();
+      rebuild.url = rebuild.url?.replaceAll('.rave', newExtension);
+      output.add(rebuild.build());
+    }
+    return output;
+  } 
 }
 
 List<VariableDefinition> extractVariable(String script) {

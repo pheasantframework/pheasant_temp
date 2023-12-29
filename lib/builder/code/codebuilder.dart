@@ -1,19 +1,33 @@
-// import 'package:raven_temp/raven_temp.dart';
-// import 'package:html/dom.dart';
-
-import 'package:raven_temp/builder/code/funbuilder.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:raven_temp/builder/analyze/analyzer.dart';
+
+import '../analyze/imports/extension.dart';
+
+import '../code/funbuilder.dart';
+
+import '../analyze/analyzer.dart';
 
 /// Model Function to render class function code during build
-String renderFunc({required String script, required String template}) {
+String renderFunc({required String script, required String template, String buildExtension = '.raven.dart'}) {
   final formatter = DartFormatter(); 
   final emitter = DartEmitter.scoped();
-
   var item = LibraryBuilder();
   // Add necessary imports
   item.directives.add(Directive.import('package:html/parser.dart', as: '_i0'));
+  item.directives.addAll(
+    RavenScript(
+        varDef: extractVariable(script), 
+        funDef: extractFunction(script),
+        impDef: extractImports(script)
+      ).imports.where((element) => fileExtension(element.url) == 'dart')
+  );
+  item.directives.addAll(
+    RavenScript(
+        varDef: extractVariable(script), 
+        funDef: extractFunction(script),
+        impDef: extractImports(script)
+      ).dartedNonDartImports(newExtension: buildExtension)
+  );
   // Create class for template
   item.body.add(
     Class((c) => c
@@ -55,7 +69,8 @@ String renderFunc({required String script, required String template}) {
         template: template, 
         ravenScript: RavenScript(
           varDef: extractVariable(script), 
-          funDef: extractFunction(script)
+          funDef: extractFunction(script),
+          impDef: extractImports(script)
         ))
       )
     )
@@ -64,3 +79,5 @@ String renderFunc({required String script, required String template}) {
 
   return formatter.format("${item.build().accept(emitter)}");
 }
+
+

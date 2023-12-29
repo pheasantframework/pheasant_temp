@@ -8,6 +8,12 @@ class NoHTML5 extends RestrictedAnnotation {
   const NoHTML5({required super.info});
 }
 
+class AltVersion extends AnnotationObject {
+  final String version;
+
+  const AltVersion(String functionName, {required this.version}) : super(info: functionName);
+}
+
 
 const html5 = AnnotationObject(info: 'This object is only allowed in HTML5');
 
