@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-/// Base class for a Pheasant Attribute/Directive in a '.pheasant' template file
+/// Base class for a Pheasant Attribute/Directive in a '.phs' template file
 abstract interface class PheasantAttributeType {
   final String name;
   final PheasantAttributeType? dependsOn;

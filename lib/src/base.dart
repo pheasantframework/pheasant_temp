@@ -1,7 +1,7 @@
 import 'dart:html';
 
 abstract class PheasantTemplate {
-  String template;
+  String? template;
 
   PheasantTemplate({required this.template});
 

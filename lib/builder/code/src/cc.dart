@@ -1,6 +1,6 @@
 import 'package:html/dom.dart';
 
-import '../../../meta/metadata.dart';
+import 'package:pheasant_meta/pheasant_meta.dart';
 
 void serveSingleComponents(Node root, String tagName) {
   List<Element> elementCategories = findAllElements(root, tagName);

@@ -92,7 +92,7 @@ class PheasantScript {
     return imports.where((element) => fileExtension(element.url) != 'dart').toList();
   } 
 
-  List<Directive> dartedNonDartImports({String newExtension = '.pheasant.dart'}) {
+  List<Directive> dartedNonDartImports({String newExtension = '.phs.dart'}) {
     List<Directive> imports = nonDartImports;
     List<Directive> output = [];
     for (var element in imports) {

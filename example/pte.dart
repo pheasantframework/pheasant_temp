@@ -27,7 +27,7 @@ void subtractNum() {
   <p>{{value}}</p>
   <p>{{number}}</p>
 </div>
-""")
+""", buildExtension: '.phs.dart')
   );
 }
 

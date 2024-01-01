@@ -8,7 +8,7 @@ import '../code/funbuilder.dart';
 import '../analyze/analyzer.dart';
 
 /// Model Function to render class function code during build
-String renderFunc({required String script, required String template, String buildExtension = '.pheasant.dart'}) {
+String renderFunc({required String script, required String template, String componentName = 'AppComponent', String buildExtension = '.phs.dart'}) {
   final formatter = DartFormatter(); 
   final emitter = DartEmitter.scoped();
   var item = LibraryBuilder();
@@ -31,8 +31,8 @@ String renderFunc({required String script, required String template, String buil
   // Create class for template
   item.body.add(
     Class((c) => c
-    ..name = 'AppComponent'
-    ..extend = refer('PheasantTemplate', 'package:pheasant/template.dart')
+    ..name = componentName
+    ..extend = refer('PheasantTemplate', 'package:pheasant_temp/pheasant_build.dart')
     ..methods.addAll(
       PheasantScript(
         varDef: extractVariable(script), 
@@ -49,8 +49,19 @@ String renderFunc({required String script, required String template, String buil
       Field((f) => f
       ..name = 'template'
       ..annotations.add(CodeExpression(Code('override')))
-      ..type = refer('String')
+      ..type = refer('String?')
       ..assignment = Code("'''$template'''")
+      )
+    )
+    ..constructors.add(
+      Constructor((con) => con
+      ..optionalParameters.add(
+        Parameter((p) => p
+        ..toSuper = true
+        ..name = 'template'
+        ..named = true
+        )
+      )
       )
     )
     ..methods.add(

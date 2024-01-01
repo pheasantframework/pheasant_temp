@@ -1,4 +1,4 @@
-import '../../meta/metadata.dart';
+import 'package:pheasant_meta/pheasant_meta.dart';
 
 /// Enhanced Enum Set for the types of components that can be rendered in the Pheasant File
 /// 
@@ -88,7 +88,7 @@ enum ElementComponentType {
 /// Enhanced enum set for all other components that are either not found in the [ElementComponentType] enum, are not comments ([ComponentType.comment]) and are not text ([ComponentType.text])
 /// They therefore represent the distinct types that fall under [ComponentType.custom].
 /// 
-/// Custom component types are either imported into the file as basic components (from a .pheasant file), or are web components created on the fly or on the file.
+/// Custom component types are either imported into the file as basic components (from a .phs file), or are web components created on the fly or on the file.
 /// Web Component types have a 'wc-' prefix, and the value of [imported] is set to false.
 /// 
 /// Any other component type not found here is therefore listed as 'undefined' and falls under [ComponentType.unknown].

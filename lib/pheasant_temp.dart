@@ -4,7 +4,7 @@
 /// BRIEF CHANGELOG
 /// for my referencing
 /// 
-/// 0.0.1 - Created basic templating engine to render basic .pheasant files, with functionality for basic attributes such as: 
+/// 0.0.1 - Created basic templating engine to render basic .phs files, with functionality for basic attributes such as: 
 /// value interpolation
 /// rendering most basic pheasant attributes and values
 /// simple rendering for medium to small templates 
@@ -20,4 +20,4 @@ library pheasant_temp;
 
 export 'components/component.dart';
 export 'builder/global.dart';
-export 'meta/metadata.dart';
+export 'package:pheasant_meta/pheasant_meta.dart';
