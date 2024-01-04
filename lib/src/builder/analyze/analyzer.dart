@@ -12,13 +12,50 @@ import 'functions/functions.dart';
 import 'variables/variable_info.dart';
 import 'variables/variable_extractor_visitor.dart';
 
+/// The `PheasantScript` class, a class used to encapsulate code defined in the `<script>` part of a pheasant file.
+/// Code defined in the script consist of none or at least one of the following:
+/// 
+/// 1. Variable Definitions: Definition of variables used for either code manipulation in the script part, or for interpolation and manipulation in the template part.
+/// In future versions, variables may also be used in sass-enabled style parts (PSM).
+/// ```dart
+/// int myNum = 9
+/// ```
+/// 
+/// 2. Function Definitions: Perform similar purposes with variables, but they are functions (of course), and they can also be used in situations such as onclick events, input events and others.
+/// In future versions, functions may also be used in sass-enabled style parts (PSM).
+/// ```dart
+/// void addNum() {
+///   myNum++;
+/// }
+/// ```
+/// 
+/// 3. Import Directives: These are used to import at least one of the following: 
+/// dart files used in the code, 
+/// pheasant components used in the **template** section of the file, 
+/// (future version) dart-pheasant components used in the **template** section of the file.
+/// ```dart
+/// import 'file.dart';
+/// ```
+/// 
+/// The [PheasantScript] class contains three variables used to store these declarations respectively, which are lists of ASTs - [VariableDefinition], [FunctionDeclaration] and [ImportDirective].
+/// The difference between [VariableDefinition] and [VariableDeclaration] is the fact that [VariableDefinition] is an encapsulated extension of [VariableDeclaration] that includes the variable's type.
+/// 
+/// The functions [extractVariable], [extractFunction] and [extractImport] are used to get these definitions and store them in the class.
+/// 
+/// In order to translate these to desired code blocks, we have getters [fields], [methods] and [imports].
 class PheasantScript {
   final List<VariableDefinition> varDef;
   final List<FunctionDeclaration> funDef;
   final List<ImportDirective> impDef;
 
+  /// Constructor to instantiate a [PheasantScript] object.
+  /// 
+  /// None of the parameters are required, so you can therefore parse only the ones required for your use case (getter).
   const PheasantScript({this.varDef = const [], this.funDef = const [], this.impDef = const []});
 
+  /// Getter to get the fields for the desired pheasant app component.
+  /// 
+  /// This method translates the ast definition [varDef] stored in the class to the `code_builder` type [Field] to use in the `renderFunc` function.
   List<Field> get fields {
     return List.generate(varDef.length, (index) {
       final variable = varDef[index];
@@ -32,6 +69,9 @@ class PheasantScript {
     });
   }
 
+    /// Getter to get the methods for the desired pheasant app component.
+  /// 
+  /// This method translates the ast definition [funDef] stored in the class to the `code_builder` type [Method] to use in the `renderFunc` function.
   List<Method> get methods {
     return List.generate(funDef.length, (index) {
       final function = funDef[index];
@@ -75,6 +115,9 @@ class PheasantScript {
     });
   }
 
+  /// Getter to get the imports for the desired pheasant app component.
+  /// 
+  /// This method translates the ast definition [impDef] stored in the class to the `code_builder` type [Directive] to use in the `renderFunc` function.
   List<Directive> get imports {
     return List.generate(impDef.length, (index) {
       final import = impDef[index];
@@ -88,10 +131,15 @@ class PheasantScript {
     });
   }
 
+  /// Getter to get the pheasant component imports
+  /// 
+  /// Since pheasant component files are not dart files by nature, the generated file instead should be imported. 
+  /// Therefore this method gets the formatted imports for the dart files generated for the pheasant components.
   List<Directive> get nonDartImports {
     return imports.where((element) => fileExtension(element.url) != 'dart').toList();
   } 
 
+  /// Function to format the extensions created by [nonDartImports] for use in the `renderFunc` function.
   List<Directive> dartedNonDartImports({String newExtension = '.phs.dart'}) {
     List<Directive> imports = nonDartImports;
     List<Directive> output = [];
@@ -104,6 +152,7 @@ class PheasantScript {
   } 
 }
 
+/// Function used to extract variable definitions from the [script] of a pheasant component file.
 List<VariableDefinition> extractVariable(String script) {
   List<VariableDefinition> outputList = [];
   CompilationUnit newUnit = parseString(content: script).unit;
@@ -117,11 +166,13 @@ List<VariableDefinition> extractVariable(String script) {
   return outputList;
 }
 
+/// Function used to extract function definitions from the [script] of a pheasant component file.
 List<FunctionDeclaration> extractFunction(String script) {
   final parseResult = parseString(content: script);
   return extractFunctions(parseResult.unit);
 }
 
+/// Function used to extract import directives from the [script] of a pheasant component file.
 List<ImportDirective> extractImports(String script) {
   CompilationUnit newUnit = parseString(content: script).unit;
   return newUnit.directives.whereType<ImportDirective>().toList();

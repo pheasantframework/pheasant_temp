@@ -1,23 +1,13 @@
 
 /// Library for pheasant templating engine
 /// 
-/// BRIEF CHANGELOG
-/// for my referencing
+/// This library is the main templating library, and contains the main functionality for creating rendered pheasant code.
+/// Normal usage of this package would require the import of this library only.
 /// 
-/// 0.0.1 - Created basic templating engine to render basic .phs files, with functionality for basic attributes such as: 
-/// value interpolation
-/// rendering most basic pheasant attributes and values
-/// simple rendering for medium to small templates 
-/// 
-/// 0.0.2 - Added support for click events (onClick, onHover, etc)
-/// 
-/// 0.0.3 - Created complete build system to write data to file, and run code
-/// 
-/// 0.0.4 - Added support for markdown code, and state management
-/// 
-/// 0.0.5 - Optimizations and final/proper testing
+/// Defined in this library is the [renderFunc] function and the [renderMain] function.
+
 library pheasant_temp;
 
-export 'components/component.dart';
-export 'builder/global.dart';
+export 'src/components/components.dart';
+export 'src/builder/builder.dart';
 export 'package:pheasant_meta/pheasant_meta.dart';

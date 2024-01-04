@@ -18,16 +18,30 @@ void subtractNum() {
   number -= 1;
 }
 """, template: """
-<div class="foo" r-for="var value in nums">
+<div class="foo" p-for="var value in nums">
   Welcome to Pheasant
-  <p>Hello World</p>
+  <p>Hello World {{number}}</p>
   <a href="#" class="fee" id="me">Click Here</a>
   <p>Aloha</p>
+  <p>{{nums[0]}}</p>
   <fruit class="fred" id="foo"/>
-  <p>{{value}}</p>
-  <p>{{number}}</p>
+  <md>
+  # Hello
+  Welcome to the Pheasant Template Example Base
+  It's quite fun here, and this text here was actually originally markdown.
+  We can write single `code` and multiblock code like this
+  ```dart
+  void main() {
+    print("Hello World");
+  }
+  ```
+  </md>
+  <Component />
 </div>
 """, buildExtension: '.phs.dart')
+  );
+  print(
+    renderMain()
   );
 }
 

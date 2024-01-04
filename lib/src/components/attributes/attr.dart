@@ -16,22 +16,22 @@ abstract interface class PheasantAttributeType {
 /// 
 /// Any other attribute not listed here is therefore placed as [PheasantAttribute.unknown].
 enum PheasantAttribute implements PheasantAttributeType {
-  r_await(name: 'r-await'),
-  r_html(name: 'r-html'),
-  r_if(name: 'r-if'),
-  r_else(name: 'r-else', dependsOn: PheasantAttribute.r_if),
-  r_elseif(name: 'r-elseif', dependsOn: PheasantAttribute.r_if),
-  r_fetch(name: 'r-fetch'),
-  r_for(name: 'r-for'),
-  r_obj(name: 'r-obj'),
-  r_once(name: 'r-obj'),
-  r_on(name: 'r-on'),
-  r_route(name: 'r-route'),
-  r_show(name: 'r-show'),
-  r_slot(name: 'r-slot'),
-  r_state(name: 'r-state'),
-  r_text(name: 'r-text'),
-  r_while(name: 'r-while'),
+  r_await(name: 'p-await'),
+  r_html(name: 'p-html'),
+  r_if(name: 'p-if'),
+  r_else(name: 'p-else', dependsOn: PheasantAttribute.r_if),
+  r_elseif(name: 'p-elseif', dependsOn: PheasantAttribute.r_if),
+  r_fetch(name: 'p-fetch'),
+  r_for(name: 'p-for'),
+  r_obj(name: 'p-obj'),
+  r_once(name: 'p-obj'),
+  r_on(name: 'p-on'),
+  r_route(name: 'p-route'),
+  r_show(name: 'p-show'),
+  r_slot(name: 'p-slot'),
+  r_state(name: 'p-state'),
+  r_text(name: 'p-text'),
+  r_while(name: 'p-while'),
   unknown(name: 'nil')
   ;
 

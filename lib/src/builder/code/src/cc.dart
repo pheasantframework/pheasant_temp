@@ -2,6 +2,9 @@ import 'package:html/dom.dart';
 
 import 'package:pheasant_meta/pheasant_meta.dart';
 
+/// Function to help in serving custom components
+/// 
+/// This helps in rendering singular custom components (self-closing) that are of the form `<Component />` by displacing the children that the `parse` function would have created. 
 void serveSingleComponents(Node root, String tagName) {
   List<Element> elementCategories = findAllElements(root, tagName);
   for (var element in elementCategories) {
@@ -9,6 +12,9 @@ void serveSingleComponents(Node root, String tagName) {
   }
 }
 
+/// Recursive Function to get all occurences of a component
+/// 
+/// This function is much like `querySelector`, but then it has support for any element tag name, including custom components.
 List<Element> findAllElements(Node root, String tagName) {
   List<Element> result = [];
 
@@ -28,7 +34,7 @@ List<Element> findAllElements(Node root, String tagName) {
 }
 
 
-@AltVersion('findAllElements', version: '0.0.3')
+@AltVersion('findAllElements', version: '0.3.0')
 List<Element> findAllElementsNonRecursive(Node root, String tagName) {
   List<Element> result = [];
   List<Node> stack = [root];

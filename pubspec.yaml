@@ -13,7 +13,8 @@ dependencies:
   code_builder: ^4.9.0
   dart_style: ^2.3.4
   html: ^0.15.4
-  pheasant_meta: ^1.0.0
+  markdown: ^7.1.1
+  pheasant_meta: ^0.1.0-alpha
   # path: ^1.8.0
 
 dev_dependencies:

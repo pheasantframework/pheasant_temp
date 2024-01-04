@@ -4,9 +4,14 @@ import 'package:code_builder/code_builder.dart';
 
 FieldModifier modifier(VariableDeclaration vd) {
   String mod = vd.beginToken.isModifier ? vd.beginToken.toString() : 'dynamic';
-  if (mod == 'const') return FieldModifier.constant;
-  else if (mod == 'final') return FieldModifier.final$;
-  else return FieldModifier.var$;
+  if (mod == 'const') {
+    return FieldModifier.constant;
+  } else if (mod == 'final') {
+    return FieldModifier.final$;
+  }
+  else {
+    return FieldModifier.var$;
+  }
 }
 
 
