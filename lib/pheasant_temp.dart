@@ -10,4 +10,5 @@ library pheasant_temp;
 
 export 'src/components/components.dart';
 export 'src/builder/builder.dart';
-export 'package:pheasant_meta/pheasant_meta.dart';
+
+export 'package:pheasant_meta/meta/metadata.dart';

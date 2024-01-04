@@ -1,2 +1,0 @@
-dartdoc:
-  nodoc: ['lib/builder/*.dart', 'lib/components/*.dart']
