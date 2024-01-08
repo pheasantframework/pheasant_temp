@@ -23,7 +23,15 @@ import '../../../components/attributes/attr.dart';
 /// [elementName] is the element name that is being rendered, used for code generation. It defaults to the main element name - `element`.
 /// 
 /// [nonDartImports] refer to imported pheasant components that are used in children rendering.
-String renderElement(String beginningFunc, Element? pheasantHtml, Iterable<String> attrmap, {String elementName = 'element', Map<String, String> nonDartImports = const {}, PheasantStyleScoped? pheasantStyleScoped}) {
+String renderElement(
+  String beginningFunc, 
+  Element? pheasantHtml, 
+  Iterable<String> attrmap, 
+  {
+    String elementName = 'element', 
+    Map<String, String> nonDartImports = const {}, 
+    PheasantStyleScoped? pheasantStyleScoped
+  }) {
   int closebracket = 0;
   // Render attributes
   beginningFunc = basicAttributes(pheasantHtml, beginningFunc, elementName: elementName, styleScoped: pheasantStyleScoped);
@@ -40,11 +48,20 @@ String renderElement(String beginningFunc, Element? pheasantHtml, Iterable<Strin
   return beginningFunc;
 }
 
+
+/// Function for adding style to elements
+/// 
+/// This function only runs once during the lifetime of recursion, which is used for rendering the 'style' part of a pheasant file.
+/// 
+/// The main component here is the [pheasantStyleScoped] item, which is a scoped and rendered pheasant style object ready for deployment.
+/// It is of the type [PheasantStyleScoped], an extended and scoped version of [PheasantStyle].
 String styleElement(String beginningFunc, PheasantStyleScoped? pheasantStyleScoped, String elementName) {
   String styleElementName = "styleElement_${pheasantStyleScoped.hashCode}";
   beginningFunc += '''
-_i2.StyleElement $styleElementName = _i2.StyleElement()..text = """${pheasantStyleScoped != null ? pheasantStyleScoped.css : ''}""";
-  $elementName.children.add($styleElementName);
+_i2.StyleElement $styleElementName = _i2.StyleElement()
+  ..text = """${pheasantStyleScoped != null ? pheasantStyleScoped.css : ''}"""
+  ..setAttribute("type", "text/css");
+  _i2.document.head?.children.add($styleElementName);
   ''';
   return beginningFunc;
 }
@@ -60,7 +77,16 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()..text = """${pheasantSty
 /// 
 /// For the case of custom components, the [nonDartImports] map contains the key-value pair representing the name and import path of the custom components.
 /// These custom components are simply rendered by calling their desired `render` function, and then attaching the returned [Element] to the parent.
-String attachChildren(Element? pheasantHtml, String beginningFunc, {String Function(String, Element?, Iterable<String>, {String elementName}) childFun = renderElement, String elementName = 'element', Map<String, String> nonDartImports = const {}}) {
+String attachChildren(
+  Element? pheasantHtml, 
+  String beginningFunc, 
+  {
+    String Function(String, Element?, Iterable<String>, {String elementName, Map<String, String> nonDartImports}) childFun = renderElement, 
+    String elementName = 'element', 
+    Map<String, String> nonDartImports = const {}, 
+    PheasantStyleScoped? pheasantStyleScoped, 
+    Iterable<String> attrmap = const []
+  }) {
   // Ensure that children exist before running code
   if (pheasantHtml!.nodes.isNotEmpty) {
     // Iterate through all `nodes` (not just elements)
@@ -84,7 +110,7 @@ String attachChildren(Element? pheasantHtml, String beginningFunc, {String Funct
         if (element.localName == 'md') {
           // Markdown components can be easily rendered with just two lines, thanks to the markdown package.
           // Do take note that the data must be flat down (no scope indentation) - for now
-          beginningFunc += "_i2.Element $childname = _i2.Element.div()..innerHtml = '''${markdownToHtml(element.innerHtml)}''';";
+          beginningFunc = markdownRender(beginningFunc, childname, element, pheasantStyleScoped, attrmap);
           beginningFunc += '$elementName.children.add($childname);';
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
@@ -96,13 +122,33 @@ _i2.Element $childname = ${childname}component.render(${childname}component.temp
             beginningFunc += "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
           }
           String childstrFunc = "";
-          childstrFunc = childFun(childstrFunc, element, PheasantAttribute.values.map((e) => e.name), elementName: childname);
+          childstrFunc = childFun(childstrFunc, element, PheasantAttribute.values.map((e) => e.name), elementName: childname, nonDartImports: nonDartImports);
           beginningFunc += childstrFunc;
           beginningFunc += '$elementName.children.add($childname);';
         }
       }
     });
   }
+  return beginningFunc;
+}
+
+/// Function used for rendering markdown code.
+/// 
+/// This function is specially attributed to rendering markdown code, as markdown is compiled to HTML in the framework. 
+/// 
+/// In all markdown code, there are no direct children (only markdown). So most of the rendering comes from attribute rendering. 
+String markdownRender(String beginningFunc, String childname, Element element, PheasantStyleScoped? pheasantStyleScoped, Iterable<String> attrmap) {
+  beginningFunc += "_i2.Element $childname = _i2.Element.div();";
+  int closebracket = 0;
+  // Render attributes
+  beginningFunc = basicAttributes(element, beginningFunc, elementName: childname, styleScoped: pheasantStyleScoped);
+
+  final tempobj = pheasantAttributes(element, attrmap, beginningFunc, closebracket,  elementName: childname);
+  beginningFunc = tempobj.value;
+  closebracket = tempobj.number;
+  beginningFunc += "$childname.innerHtml = '''${markdownToHtml(element.innerHtml)}''';";
+
+  beginningFunc += ('}\n' * closebracket);
   return beginningFunc;
 }
 
