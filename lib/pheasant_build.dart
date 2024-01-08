@@ -8,4 +8,4 @@
 library pheasant_build;
 
 export 'src/base.dart';
-export 'package:pheasant_meta/meta/metadata.dart';
+export 'package:pheasant_meta/src/meta/metadata.dart';

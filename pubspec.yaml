@@ -2,7 +2,7 @@ name: pheasant_temp
 description: >-
   The Pheasant Framework Templating Engine to Create Renderable Dart Code for Pheasant Code.
 version: 0.1.0-alpha
-# repository: https://github.com/my_org/my_repo
+repository: https://github.com/pheasantframework/pheasant_temp
 
 environment:
   sdk: '>=3.0.0'
@@ -15,6 +15,7 @@ dependencies:
   html: ^0.15.4
   markdown: ^7.1.1
   pheasant_meta: ^0.1.0-alpha
+  pheasant_assets: ^0.1.0-alpha
   # path: ^1.8.0
 
 dev_dependencies:
@@ -24,6 +25,8 @@ dev_dependencies:
 dependency_overrides: 
   pheasant_meta:
     path: ../pheasant_meta
+  pheasant_assets:
+    path: ../pheasant_assets
 
 topics:
   - pheasant
