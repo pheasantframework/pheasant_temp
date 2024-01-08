@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
+import 'package:pheasant_assets/pheasant_assets.dart';
 
 import '../../code/src/tempclass.dart';
 import '../../../components/attributes/attr.dart';
@@ -22,19 +23,29 @@ import '../../../components/attributes/attr.dart';
 /// [elementName] is the element name that is being rendered, used for code generation. It defaults to the main element name - `element`.
 /// 
 /// [nonDartImports] refer to imported pheasant components that are used in children rendering.
-String renderElement(String beginningFunc, Element? pheasantHtml, Iterable<String> attrmap, {String elementName = 'element', Map<String, String> nonDartImports = const {}}) {
+String renderElement(String beginningFunc, Element? pheasantHtml, Iterable<String> attrmap, {String elementName = 'element', Map<String, String> nonDartImports = const {}, PheasantStyleScoped? pheasantStyleScoped}) {
   int closebracket = 0;
   // Render attributes
-  beginningFunc = basicAttributes(pheasantHtml, beginningFunc, elementName: elementName);
+  beginningFunc = basicAttributes(pheasantHtml, beginningFunc, elementName: elementName, styleScoped: pheasantStyleScoped);
 
   final tempobj = pheasantAttributes(pheasantHtml, attrmap, beginningFunc, closebracket,  elementName: elementName);
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
+
   // Add children
   beginningFunc = attachChildren(pheasantHtml, beginningFunc,  elementName: elementName, nonDartImports: nonDartImports);
   
   // Add remaining closed braces to close up scope and render valid dart code
   beginningFunc += ('}\n' * closebracket);
+  return beginningFunc;
+}
+
+String styleElement(String beginningFunc, PheasantStyleScoped? pheasantStyleScoped, String elementName) {
+  String styleElementName = "styleElement_${pheasantStyleScoped.hashCode}";
+  beginningFunc += '''
+_i2.StyleElement $styleElementName = _i2.StyleElement()..text = """${pheasantStyleScoped != null ? pheasantStyleScoped.css : ''}""";
+  $elementName.children.add($styleElementName);
+  ''';
   return beginningFunc;
 }
 
@@ -159,15 +170,18 @@ TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, Iterable<Strin
 /// 
 /// This function asseses the [Element] named [pheasantHtml] and then iterates through the attributes in the element. 
 /// It then adds the appropriate line of code to render it.
-String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elementName = 'element'}) {
+String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (attr.key == 'class' || attr.key == 'className') {
-      beginningFunc += '$elementName.classes.add(${attr.value});';
+      beginningFunc += '$elementName.classes.add("${attr.value}");';
     } else if (attr.key == 'href' || attr.key == 'id') {
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     } else if (!PheasantAttribute.values.map((e) => e.name).contains(attr.key)){
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", ${attr.value});';
     }
+  }
+  if (styleScoped != null && styleScoped.scoped) {
+    beginningFunc += '$elementName.classes.add("${styleScoped.id}");';
   }
   return beginningFunc;
 }

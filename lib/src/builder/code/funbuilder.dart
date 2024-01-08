@@ -1,6 +1,7 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
+import 'package:pheasant_assets/pheasant_assets.dart';
 
 import 'custom_components.dart';
 import '../analyze/analyze.dart';
@@ -16,7 +17,7 @@ import '../../components/attributes/attr.dart';
 /// The [template] variable is also needed to generate the code.
 /// 
 /// The code is generated line-by-line, statement-by-statement, and then the final string is returned as a [Code] block.
-Code renderRenderFunc({PheasantScript pheasantScript = const PheasantScript(), required String template}) {
+Code renderRenderFunc({PheasantScript pheasantScript = const PheasantScript(), required String template, PheasantStyle pheasantStyle = const PheasantStyle()}) {
   String beginningFunc = '''
 
 ''';
@@ -47,6 +48,7 @@ final PheasantHtml = _i0.parse(body).body!.children.first;
   if (PheasantHtml.localName == 'md') {
     String switchedHtml = markdownToHtml(PheasantHtml.innerHtml);
     beginningFunc += "_i2.Element element = _i2.Element.div()..innerHtml = '''$switchedHtml''';";
+    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle), 'element');
   } else {
     beginningFunc += "_i2.Element element = _i2.Element.tag(PheasantHtml.localName!);";
     // Configure the custom components
@@ -54,7 +56,14 @@ final PheasantHtml = _i0.parse(body).body!.children.first;
     formatCustomComponents(importMap, template, PheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
-    beginningFunc = renderElement(beginningFunc, PheasantHtml, attrmap, nonDartImports: importMap);
+    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle), 'element');
+    beginningFunc = renderElement(
+      beginningFunc, 
+      PheasantHtml, 
+      attrmap, 
+      nonDartImports: importMap, 
+      pheasantStyleScoped: scopeComponents(pheasantStyle)
+    );
   }
   // Final Line
   beginningFunc += 'return element;';
