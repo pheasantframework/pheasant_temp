@@ -27,7 +27,14 @@ import '../code/funbuilder.dart';
 /// 4. Creates the constructor, to call super, and overrides the `template` variable from the parent class.
 /// 
 /// 5. Generates the definition for, and overrides, the `render` function in the parent class, to return an element of type `Element`
-String renderFunc({required String script, required String template, String componentName = 'AppComponent', String buildExtension = '.phs.dart', PheasantStyle pheasantStyle = const PheasantStyle()}) {
+String renderFunc({
+  required String script, 
+  required String template, 
+  String componentName = 'AppComponent', 
+  String buildExtension = '.phs.dart', 
+  PheasantStyle pheasantStyle = const PheasantStyle(),
+  String appPath = 'lib'
+}) {
   // Get emitter and formatter 
   final formatter = DartFormatter(); 
   final emitter = DartEmitter.scoped();
@@ -113,7 +120,8 @@ String renderFunc({required String script, required String template, String comp
           funDef: extractFunction(script),
           impDef: extractImports(script)
         ),
-        pheasantStyle: pheasantStyle
+        pheasantStyle: pheasantStyle,
+        appPath: appPath
         )
       )
     )

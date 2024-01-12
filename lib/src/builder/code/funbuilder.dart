@@ -17,7 +17,12 @@ import '../../components/attributes/attr.dart';
 /// The [template] variable is also needed to generate the code.
 /// 
 /// The code is generated line-by-line, statement-by-statement, and then the final string is returned as a [Code] block.
-Code renderRenderFunc({PheasantScript pheasantScript = const PheasantScript(), required String template, PheasantStyle pheasantStyle = const PheasantStyle()}) {
+Code renderRenderFunc({
+  PheasantScript pheasantScript = const PheasantScript(), 
+  required String template, 
+  PheasantStyle pheasantStyle = const PheasantStyle(),
+  String appPath = 'lib'
+}) {
   String beginningFunc = '''
 
 ''';
@@ -62,7 +67,7 @@ final PheasantHtml = _i0.parse(body).body!.children.first;
       PheasantHtml, 
       attrmap, 
       nonDartImports: importMap, 
-      pheasantStyleScoped: scopeComponents(pheasantStyle)
+      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appPath)
     );
   }
   // Final Line
