@@ -1,4 +1,4 @@
-# <center>The Pheasant Template Engine</center>
+# <center>The Pheasant Framework Template Engine</center>
 <!-- Add basic info about this thing -->
 Welcome to the Pheasant Templating engine package. 
 

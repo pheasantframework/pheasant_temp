@@ -6,7 +6,7 @@ Before you get started, please take a moment to review our contribution guidelin
 
 ## Code of Conduct
 
-This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code. Please report any unacceptable behavior to [this email](pheasant@tech.nugegroup.com).
+This project and everyone participating in it are governed by our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you agree to uphold this code. Please report any unacceptable behavior to [this email](raven@tech.nugegroup.com).
 
 ## How to Contribute
 
