@@ -5,7 +5,6 @@
 /// Normal usage of this package would require the import of this library only.
 /// 
 /// Defined in this library is the [renderFunc] function and the [renderMain] function.
-
 library pheasant_temp;
 
 export 'src/components/components.dart';
