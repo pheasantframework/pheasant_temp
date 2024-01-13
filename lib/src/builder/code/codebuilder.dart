@@ -45,7 +45,6 @@ String renderFunc({
   var item = LibraryBuilder();
 
   // Add necessary imports
-  item.directives.add(Directive.import('package:html/parser.dart', as: '_i0')); // Required import
   item.directives.addAll(
     PheasantScript(
         varDef: extractVariable(script), 
@@ -65,7 +64,7 @@ String renderFunc({
   item.body.add(
     Class((c) => c
     ..name = componentName
-    ..extend = refer('PheasantTemplate', 'package:pheasant_temp/pheasant_build.dart')
+    ..extend = refer('PheasantTemplate', 'package:pheasant/build.dart')
     // Add methods generated from `script` file
     ..methods.addAll(
       PheasantScript(
