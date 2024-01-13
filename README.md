@@ -9,9 +9,9 @@ It can be used for low-level handling of pheasant file data.
 
 ### Some things to note
 
-This package is constantly under development, and may not be perfect. If you have any issues with this package, or any packages that depend on it because of this package, please feel free to raise an issue, and we will work on it. 
+This package is constantly under development, and may not be perfect. If you have any issues with this package, or any packages that depend on it because of this package, please feel free to raise an issue, and we will work on it. Ensure to [follow the guidelines](./CODE_OF_CONDUCT.md), though. 
 
-If you have any contributions to make, feel free. Please read the Contributing document, and make your contributions as guided. All contributions concerning this package are welcome and are reviewed in order to constantly give performant features.
+If you have any contributions to make, feel free, just [follow the contribution guidelines](./CONTRIBUTING.md), and make your contributions as guided. All contributions concerning this package are welcome and are reviewed in order to constantly give performant features.
 
 ## Features
 
