@@ -32,8 +32,8 @@ String renderFunc({
   required String template, 
   String componentName = 'AppComponent', 
   String buildExtension = '.phs.dart', 
+  final String? appDirPath,
   PheasantStyle pheasantStyle = const PheasantStyle(),
-  String appPath = 'lib'
 }) {
   // Get emitter and formatter 
   final formatter = DartFormatter(); 
@@ -121,13 +121,12 @@ String renderFunc({
           impDef: extractImports(script)
         ),
         pheasantStyle: pheasantStyle,
-        appPath: appPath
+        appDirPath: appDirPath ?? 'lib'
         )
       )
     )
     )
   );
-
   // Return complete class instance as formatted string
   return formatter.format("${item.build().accept(emitter)}");
 }

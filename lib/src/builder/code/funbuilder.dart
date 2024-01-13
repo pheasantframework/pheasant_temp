@@ -21,7 +21,7 @@ Code renderRenderFunc({
   PheasantScript pheasantScript = const PheasantScript(), 
   required String template, 
   PheasantStyle pheasantStyle = const PheasantStyle(),
-  String appPath = 'lib'
+  final String appDirPath = 'lib'
 }) {
   String beginningFunc = '''
 
@@ -53,21 +53,23 @@ final PheasantHtml = _i0.parse(body).body!.children.first;
   if (PheasantHtml.localName == 'md') {
     String switchedHtml = markdownToHtml(PheasantHtml.innerHtml);
     beginningFunc += "_i2.Element element = _i2.Element.div()..innerHtml = '''$switchedHtml''';";
-    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle), 'element');
+    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
   } else {
+
     beginningFunc += "_i2.Element element = _i2.Element.tag(PheasantHtml.localName!);";
     // Configure the custom components
     Map<String, String> importMap = { for (var element in pheasantScript.nonDartImports) (element).as! : (element).url };
     formatCustomComponents(importMap, template, PheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
-    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle), 'element');
+    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
+
     beginningFunc = renderElement(
       beginningFunc, 
       PheasantHtml, 
       attrmap, 
       nonDartImports: importMap, 
-      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appPath)
+      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath)
     );
   }
   // Final Line
