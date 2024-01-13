@@ -1,4 +1,5 @@
 import 'package:html/dom.dart';
+import 'package:pheasant_temp/src/exceptions/exceptions.dart';
 import 'src/cc.dart';
 
 /// Function to help in rendering custom components
@@ -36,16 +37,20 @@ import 'src/cc.dart';
 /// <p>Aloha</p>
 /// <!-- to parent -->
 /// ```
-void formatCustomComponents(Map<String, String> importMap, String template, Element PheasantHtml) {
+void formatCustomComponents(Map<String, String> importMap, String template, Element pheasantHtml) {
   String componentName = "";
-  importMap.keys.forEach((element) {
+  for (var element in importMap.keys) {
     componentName = element;
     var regen = RegExp('<(?<component>$componentName)\\s*(?:/|></\\k<component>)?>');
+    try {
     Iterable<Match> regexMatches = regen.allMatches(template);
     regexMatches.map((e) => e[0]).forEach((el) {
       if ((el ?? '').contains('/')) {
-        serveSingleComponents(PheasantHtml, componentName);
+        serveSingleComponents(pheasantHtml, componentName);
       }
     });
-  });
+    } catch (e) {
+      throw PheasantTemplateException('Error Rendering Custom Component: $e');
+    }
+  }
 }

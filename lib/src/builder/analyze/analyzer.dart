@@ -2,6 +2,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
 import 'package:code_builder/code_builder.dart';
+import 'package:pheasant_temp/src/exceptions/exceptions.dart';
 
 import '../analyze/imports/combinators.dart';
 import '../analyze/imports/extension.dart';
@@ -153,27 +154,59 @@ class PheasantScript {
 }
 
 /// Function used to extract variable definitions from the [script] of a pheasant component file.
+/// 
+/// Throws a [PheasantTemplateException] in the event of any errors during parsing.
 List<VariableDefinition> extractVariable(String script) {
   List<VariableDefinition> outputList = [];
+  final result = parseString(content: script);
+  if (result.errors.isNotEmpty) {
+    throw PheasantTemplateException('''
+Error Reading Script Component: Variable Error: ${result.errors.map((e) => e.problemMessage)} 
+Fix: ${result.errors.map((e) => e.correctionMessage)} 
+''', 
+      exitCode: result.errors.map((e) => e.errorCode.numParameters).first,
+    );
+  }
   CompilationUnit newUnit = parseString(content: script).unit;
   VariableExtractorVisitor visitor = VariableExtractorVisitor();
 
-  newUnit.declarations.forEach((element) {
+  for (var element in newUnit.declarations) {
     element.accept(visitor);
     outputList.addAll(visitor.variableList);
     visitor = VariableExtractorVisitor();
-  });
+  }
   return outputList;
 }
 
 /// Function used to extract function definitions from the [script] of a pheasant component file.
+/// 
+/// Throws a [PheasantTemplateException] in the event of any errors during parsing.
 List<FunctionDeclaration> extractFunction(String script) {
-  final parseResult = parseString(content: script);
-  return extractFunctions(parseResult.unit);
+  final result = parseString(content: script);
+  if (result.errors.isNotEmpty) {
+    throw PheasantTemplateException('''
+Error Reading Script Component: Variable Error: ${result.errors.map((e) => e.problemMessage)} 
+Fix: ${result.errors.map((e) => e.correctionMessage)} 
+''', 
+      exitCode: result.errors.map((e) => e.errorCode.numParameters).first,
+    );
+  }
+  return extractFunctions(result.unit);
 }
 
 /// Function used to extract import directives from the [script] of a pheasant component file.
+/// 
+/// Throws a [PheasantTemplateException] in the event of any errors during parsing.
 List<ImportDirective> extractImports(String script) {
+  final result = parseString(content: script);
+  if (result.errors.isNotEmpty) {
+    throw PheasantTemplateException('''
+Error Reading Script Component: Variable Error: ${result.errors.map((e) => e.problemMessage)} 
+Fix: ${result.errors.map((e) => e.correctionMessage)} 
+''', 
+      exitCode: result.errors.map((e) => e.errorCode.numParameters).first,
+    );
+  }
   CompilationUnit newUnit = parseString(content: script).unit;
   return newUnit.directives.whereType<ImportDirective>().toList();
 }

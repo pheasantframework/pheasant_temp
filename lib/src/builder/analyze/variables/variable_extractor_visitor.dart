@@ -11,7 +11,10 @@ class VariableExtractorVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitVariableDeclaration(VariableDeclaration node) {
     super.visitVariableDeclaration(node);
-
-    variableList.add(VariableDefinition(declaration: node, dataType: (node.parent as VariableDeclarationList).type?.toSource() ?? 'dynamic'));
+    try {
+      variableList.add(VariableDefinition(declaration: node, dataType: (node.parent as VariableDeclarationList).type?.toSource() ?? 'dynamic'));
+    } catch (e) {
+      // Do not include
+    }
   }
 }

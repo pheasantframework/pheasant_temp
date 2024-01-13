@@ -26,8 +26,7 @@ import '../../../components/attributes/attr.dart';
 String renderElement(
   String beginningFunc, 
   Element? pheasantHtml, 
-  Iterable<String> attrmap, 
-  {
+  Iterable<String> attrmap, {
     String elementName = 'element', 
     Map<String, String> nonDartImports = const {}, 
     PheasantStyleScoped? pheasantStyleScoped
@@ -90,7 +89,7 @@ String attachChildren(
   // Ensure that children exist before running code
   if (pheasantHtml!.nodes.isNotEmpty) {
     // Iterate through all `nodes` (not just elements)
-    pheasantHtml.nodes.forEach((element) {
+    for (var element in pheasantHtml.nodes) {
       // Ignore part rendering for cases of `p-text`
       if (element.parent!.attributes.containsKey('p-text') && pheasantHtml.nodes.last == element) {
         
@@ -127,7 +126,7 @@ _i2.Element $childname = ${childname}component.render(${childname}component.temp
           beginningFunc += '$elementName.children.add($childname);';
         }
       }
-    });
+    }
   }
   return beginningFunc;
 }
@@ -168,34 +167,34 @@ TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, Iterable<Strin
       String value = attr.value;
       String statement = '';
       switch (defAttr) {
-        case PheasantAttribute.r_if:
+        case PheasantAttribute.p_if:
           statement = 'if ($value) {';
           closebracket++;
           break;
-        case PheasantAttribute.r_while:
+        case PheasantAttribute.p_while:
           statement = 'while ($value) {';
           closebracket++;
           break;
-        case PheasantAttribute.r_for:
+        case PheasantAttribute.p_for:
           statement = 'for ($value) {';
           closebracket++;
           break;
-        case PheasantAttribute.r_html:
+        case PheasantAttribute.p_html:
           pheasantHtml.innerHtml += value; 
           statement = '$elementName.innerHtml = $elementName.innerHtml == null ? "$value" : $elementName.innerHtml! + "$value";';
           break;
-        case PheasantAttribute.r_text:
+        case PheasantAttribute.p_text:
           pheasantHtml.nodes.add(Text(value));
           statement = '$elementName.append(_i2.Text("\${$value}"));';
           break;
-        case PheasantAttribute.r_else:
+        case PheasantAttribute.p_else:
           if ((pheasantHtml.previousElementSibling?.attributes
           .entries.map((e) => e.key) ?? []).contains('p-if')) {
             statement = 'else {';
             closebracket++;
           }
           break;
-        case PheasantAttribute.r_elseif:
+        case PheasantAttribute.p_elseif:
           if ((pheasantHtml.previousElementSibling?.attributes
           .entries.map((e) => e.key) ?? []).contains('p-if')) {
             statement = 'else if ($value) {';

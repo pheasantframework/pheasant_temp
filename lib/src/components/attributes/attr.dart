@@ -1,6 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 /// Base class for a Pheasant Attribute/Directive in a '.phs' template file
+/// 
+/// The class encapsulates the base info of all attributes: 
 abstract interface class PheasantAttributeType {
   final String name;
   final PheasantAttributeType? dependsOn;
@@ -16,22 +18,22 @@ abstract interface class PheasantAttributeType {
 /// 
 /// Any other attribute not listed here is therefore placed as [PheasantAttribute.unknown].
 enum PheasantAttribute implements PheasantAttributeType {
-  r_await(name: 'p-await'),
-  r_html(name: 'p-html'),
-  r_if(name: 'p-if'),
-  r_else(name: 'p-else', dependsOn: PheasantAttribute.r_if),
-  r_elseif(name: 'p-elseif', dependsOn: PheasantAttribute.r_if),
-  r_fetch(name: 'p-fetch'),
-  r_for(name: 'p-for'),
-  r_obj(name: 'p-obj'),
-  r_once(name: 'p-obj'),
-  r_on(name: 'p-on'),
-  r_route(name: 'p-route'),
-  r_show(name: 'p-show'),
-  r_slot(name: 'p-slot'),
-  r_state(name: 'p-state'),
-  r_text(name: 'p-text'),
-  r_while(name: 'p-while'),
+  p_await(name: 'p-await'),
+  p_html(name: 'p-html'),
+  p_if(name: 'p-if'),
+  p_else(name: 'p-else', dependsOn: PheasantAttribute.p_if),
+  p_elseif(name: 'p-elseif', dependsOn: PheasantAttribute.p_if),
+  p_fetch(name: 'p-fetch'),
+  p_for(name: 'p-for'),
+  p_obj(name: 'p-obj'),
+  p_once(name: 'p-obj'),
+  p_on(name: 'p-on'),
+  p_route(name: 'p-route'),
+  p_show(name: 'p-show'),
+  p_slot(name: 'p-slot'),
+  p_state(name: 'p-state'),
+  p_text(name: 'p-text'),
+  p_while(name: 'p-while'),
   unknown(name: 'nil')
   ;
 

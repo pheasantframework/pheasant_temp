@@ -2,6 +2,7 @@ import 'package:code_builder/code_builder.dart';
 import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart';
+import 'package:pheasant_temp/src/exceptions/exceptions.dart';
 
 import 'custom_components.dart';
 import '../analyze/analyze.dart';
@@ -44,14 +45,28 @@ Code renderRenderFunc({
     beginningFunc += statement;
   }
   // Create the desired element
-  final PheasantHtml = HtmlParser(template, lowercaseElementName: false).parse().body!.children.first;
+  final pheasant = HtmlParser(template, lowercaseElementName: false);
+  final pheasantHtml = pheasant.parse().children.first;
+  if (pheasant.errors.isNotEmpty) {
+    print('Issues Parsing Template Data: ${
+      pheasant.errors.map((e) => e.message)
+      .where((element) {
+        return (!element.contains('solidus not allowed on element') && !element.contains('Expected DOCTYPE'));
+      })
+    }');
+  }
   // Create the element via parsing
   beginningFunc += '''
 final PheasantHtml = _i0.parse(body).body!.children.first;
 ''';
   // Render the data
-  if (PheasantHtml.localName == 'md') {
-    String switchedHtml = markdownToHtml(PheasantHtml.innerHtml);
+  if (pheasantHtml.localName == 'md') {
+    String switchedHtml = "";
+    try {
+      switchedHtml = markdownToHtml(pheasantHtml.innerHtml);
+    } catch (e, s) {
+      throw PheasantTemplateException('Error while parsing markdown: $e \nStack Trace: $s');
+    }
     beginningFunc += "_i2.Element element = _i2.Element.div()..innerHtml = '''$switchedHtml''';";
     beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
   } else {
@@ -59,14 +74,14 @@ final PheasantHtml = _i0.parse(body).body!.children.first;
     beginningFunc += "_i2.Element element = _i2.Element.tag(PheasantHtml.localName!);";
     // Configure the custom components
     Map<String, String> importMap = { for (var element in pheasantScript.nonDartImports) (element).as! : (element).url };
-    formatCustomComponents(importMap, template, PheasantHtml);
+    formatCustomComponents(importMap, template, pheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
     beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
 
     beginningFunc = renderElement(
       beginningFunc, 
-      PheasantHtml, 
+      pheasantHtml, 
       attrmap, 
       nonDartImports: importMap, 
       pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath)

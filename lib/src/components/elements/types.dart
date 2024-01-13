@@ -10,8 +10,10 @@ enum ComponentType {
   custom(name: 'custom'),
   unknown(name: 'nil');
 
+  /// Default constructor
   const ComponentType({required this.name});
 
+  /// The [String] name assoicated with the component type.
   final String name;
 }
 
@@ -76,9 +78,13 @@ enum ElementComponentType {
   /// The [selfclosing] boolean denotes whether it is self-closing (doesn't come in a pair of tags).
   const ElementComponentType({required this.name, required this.selfclosing});
 
+  /// The [String] name associated with this [ElementComponentType]
   final String name;
+
+  /// Whether the Component is self-closing or not
   final bool selfclosing;
 
+  /// The name of the given component
   @override
   String toString() {
     return name;
@@ -101,6 +107,9 @@ enum CustomComponentType {
 
   const CustomComponentType({required this.selfclosing, required this.imported});
 
+  /// Whether the Component is self-closing or not
   final bool selfclosing;
+
+  /// Whether the Component is imported (the component is a separate pheasant file), or it is not (a defined web component).
   final bool imported;
 }

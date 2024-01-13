@@ -17,6 +17,8 @@ import '../code/funbuilder.dart';
 /// 
 /// This function returns a string, which is the composition for the generated dart file with the extension [buildExtension] which defaults to `'.phs.dart'`.
 /// 
+/// The [appDirPath] field is for use by the [scopeComponents] function alongside the [PheasantStyle] object in the event that css/scss/sass files are being imported.
+/// 
 /// The function does the following, in the given order:
 /// 1. Adds the required directives needed for the code: It starts off with the directives needed for every instance of a component, then adds imports included in the pheasant file.
 /// 
