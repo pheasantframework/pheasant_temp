@@ -1,5 +1,8 @@
 # <center>The Pheasant Framework Template Engine</center>
-<!-- Add basic info about this thing -->
+
+![Pub Version](https://img.shields.io/pub/v/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)  ![Pub Publisher](https://img.shields.io/pub/publisher/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)
+
+
 Welcome to the Pheasant Templating engine package. 
 
 This package is used to render content from .phs files into dart template files to be used during build time.
@@ -74,4 +77,6 @@ This package is licensed under the same license as the Pheasant Framework. For m
 
 ## Additional information
 
-For more information on how this package is used in the Pheasant Framework, please check out the full framework on [Github]() or on [Dart Pub]().
+For more information on how this package is used in the Pheasant Framework, please check out the full framework on [Github](https://github.com/pheasantframework/pheasant) or on [Dart Pub]().
+
+For more information on this particular package, including it's api reference, you can check it out on [dart pub here]().
