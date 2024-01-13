@@ -15,7 +15,7 @@ We welcome contributions in the form of bug reports, feature requests, code impr
 1. Fork the repository to your GitHub account.
 2. Clone the forked repository to your local machine.
    ```bash
-   git clone https://github.com/your-username/your-package.git
+   git clone https://github.com/pheasantframework/pheasant_temp.git
    ```
 3. Create a new branch for your changes.
    ```bash
@@ -42,7 +42,7 @@ Please follow these guidelines when contributing to the project:
 
 ## Bug Reports
 
-If you encounter a bug, please submit an issue on the [issue tracker](https://github.com/your-username/your-package/issues) with the following information:
+If you encounter a bug, please submit an issue on the [issue tracker](https://github.com/pheasantframework/pheasant_temp/issues) with the following information:
 
 - A clear and descriptive title.
 - A detailed description of the issue, including steps to reproduce.
@@ -52,7 +52,7 @@ If you encounter a bug, please submit an issue on the [issue tracker](https://gi
 
 ## Feature Requests
 
-We welcome suggestions for new features, improvements and optimizations. Please submit a feature request on the [issue tracker](https://github.com/your-username/your-package/issues) with the following information:
+We welcome suggestions for new features, improvements and optimizations. Please submit a feature request on the [issue tracker](https://github.com/pheasantframework/pheasant_temp/issues) with the following information:
 
 - A clear and descriptive title.
 - A detailed description of the proposed feature.
