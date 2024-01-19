@@ -1,9 +1,12 @@
 import 'package:html/dom.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart';
+import 'package:pheasant_temp/src/builder/code/src/events.dart';
 
 import '../../code/src/tempclass.dart';
 import '../../../components/attributes/attr.dart';
+
+// TODO: Write comments for new functions, and event change comments
 
 /// This is the much rather recursive function used in rendering the element variable.
 /// 
@@ -30,15 +33,13 @@ String renderElement(
     String elementName = 'element', 
     Map<String, String> nonDartImports = const {}, 
     PheasantStyleScoped? pheasantStyleScoped
-  }) {
+  }) {  
+  beginningFunc = basicAttributes(pheasantHtml, beginningFunc, elementName: elementName, styleScoped: pheasantStyleScoped);
   int closebracket = 0;
   // Render attributes
-  beginningFunc = basicAttributes(pheasantHtml, beginningFunc, elementName: elementName, styleScoped: pheasantStyleScoped);
-
-  final tempobj = pheasantAttributes(pheasantHtml, attrmap, beginningFunc, closebracket,  elementName: elementName);
+  final tempobj = pheasantAttributes(pheasantHtml, attrmap: attrmap, beginningFunc, closebracket,  elementName: elementName);
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
-
   // Add children
   beginningFunc = attachChildren(pheasantHtml, beginningFunc,  elementName: elementName, nonDartImports: nonDartImports);
   
@@ -64,6 +65,8 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
   ''';
   return beginningFunc;
 }
+
+// TODO: Add docs for the extended custom component control.
 
 /// This function is used to render and attach children - both text nodes and elements - to their parents and reflect the functionality for the code.
 /// 
@@ -100,6 +103,11 @@ String attachChildren(
           final regex = RegExp(r'\{\{([^\}]+)\}\}');
           Match match = regex.allMatches(element.text ?? '').first;
           element.text = '\${${match[1]}}';
+        } else if ((element.text ?? '').contains(RegExp(r'\{([^\}]+)\}'))) {
+          // Remove interpolation and add desired value
+          final regex = RegExp(r'\{([^\}]+)\}');
+          Match match = regex.allMatches(element.text ?? '').first;
+          element.text = '\${${match[1]}}';
         }
         beginningFunc += '$elementName.append(_i2.Text("""${element.text}"""));';
       } else {
@@ -113,8 +121,18 @@ String attachChildren(
           beginningFunc += '$elementName.children.add($childname);';
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
+            var componentItem = '${element.localName}.${'${element.localName!}Component()'}';
+            if (element.attributes.keys.where((element) => (element as String).contains('p-bind')).isNotEmpty) {
+              var props = element.attributes.entries.where((element) => (element.key as String).contains('p-bind'));
+              Map<String, dynamic> params = Map.fromIterables(
+                props.map((e) => (e.key as String).replaceAll('p-bind:', '')),
+                props.map((e) => e.value)
+              );
+              String paramlist = params.entries.map((e) => "${e.key}: ${e.value}").join(', ');
+              componentItem = '${element.localName}.${'${element.localName!}Component($paramlist)'}';
+            }
             beginningFunc += '''
-final ${childname}component = ${element.localName}.${'${element.localName!}Component()'};
+final ${childname}component = $componentItem;
 _i2.Element $childname = ${childname}component.render(${childname}component.template!);
 ''';
           } else {
@@ -123,7 +141,15 @@ _i2.Element $childname = ${childname}component.render(${childname}component.temp
           String childstrFunc = "";
           childstrFunc = childFun(childstrFunc, element, PheasantAttribute.values.map((e) => e.name), elementName: childname, nonDartImports: nonDartImports);
           beginningFunc += childstrFunc;
-          beginningFunc += '$elementName.children.add($childname);';
+          if (nonDartImports.keys.contains(element.parent!.localName)) {
+            if (element.attributes.keys.where((object) => (object as String).contains('p-slot')).isNotEmpty) {
+              beginningFunc += "$elementName.querySelector('slot #${(element.attributes.keys.singleWhere((element) => (element as String).contains('p-slot')) as String).replaceFirst('p-slot:', '')}')?.children.add($childname);";
+            } else {
+              beginningFunc += "$elementName.querySelector('slot')?.children.add($childname);";
+            }
+          } else {
+            beginningFunc += '$elementName.children.add($childname);';
+          }
         }
       }
     }
@@ -142,7 +168,7 @@ String markdownRender(String beginningFunc, String childname, Element element, P
   // Render attributes
   beginningFunc = basicAttributes(element, beginningFunc, elementName: childname, styleScoped: pheasantStyleScoped);
 
-  final tempobj = pheasantAttributes(element, attrmap, beginningFunc, closebracket,  elementName: childname);
+  final tempobj = pheasantAttributes(element, attrmap: attrmap, beginningFunc, closebracket,  elementName: childname);
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
   beginningFunc += "$childname.innerHtml = '''${markdownToHtml(element.innerHtml)}''';";
@@ -160,56 +186,137 @@ String markdownRender(String beginningFunc, String childname, Element element, P
 /// The code returns a [TempPheasantRenderClass], which is a temporary class containing the new beginningFunc String `value` and the new closebracket integer `number`.
 /// 
 /// `closebracket` here represents the number of close braces to add for scoped code (due to cases such as `if`, `for` and `while` loops).
-TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, Iterable<String> attrmap, String beginningFunc, int closebracket, {String elementName = 'element'}) {
+TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, String beginningFunc, int closebracket, {String elementName = 'element', Iterable<String>? attrmap, Iterable<String>? eventAttrMap}) {
+  Iterable<String> attributeMap = attrmap ?? PheasantAttribute.values.map((e) => e.name);
+  Iterable<String> eventAttributeMap = eventAttrMap ?? PheasantEventHandlingAttribute.values.map((e) => e.name);
   for (var attr in pheasantHtml!.attributes.entries) {
-    if (attrmap.contains(attr.key)) {
-      PheasantAttribute defAttr = PheasantAttribute.values[attrmap.toList().indexOf(attr.key as String)];
+    if (attributeMap.contains(attr.key)) {
+      PheasantAttribute defAttr = PheasantAttribute.values[attributeMap.toList().indexOf(attr.key as String)];
       String value = attr.value;
       String statement = '';
-      switch (defAttr) {
-        case PheasantAttribute.p_if:
-          statement = 'if ($value) {';
-          closebracket++;
-          break;
-        case PheasantAttribute.p_while:
-          statement = 'while ($value) {';
-          closebracket++;
-          break;
-        case PheasantAttribute.p_for:
-          statement = 'for ($value) {';
-          closebracket++;
-          break;
-        case PheasantAttribute.p_html:
-          pheasantHtml.innerHtml += value; 
-          statement = '$elementName.innerHtml = $elementName.innerHtml == null ? "$value" : $elementName.innerHtml! + "$value";';
-          break;
-        case PheasantAttribute.p_text:
-          pheasantHtml.nodes.add(Text(value));
-          statement = '$elementName.append(_i2.Text("\${$value}"));';
-          break;
-        case PheasantAttribute.p_else:
-          if ((pheasantHtml.previousElementSibling?.attributes
-          .entries.map((e) => e.key) ?? []).contains('p-if')) {
-            statement = 'else {';
-            closebracket++;
-          }
-          break;
-        case PheasantAttribute.p_elseif:
-          if ((pheasantHtml.previousElementSibling?.attributes
-          .entries.map((e) => e.key) ?? []).contains('p-if')) {
-            statement = 'else if ($value) {';
-            closebracket++;
-          }
-          break;
-        default:
-      }
+      TempPheasantRenderClass compound = pheasantBasicAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
+      closebracket = compound.number;
+      statement = compound.value;
       beginningFunc += '$statement\n';
       continue;
+    } else if (eventAttributeMap.contains(attr.key)) {
+      PheasantEventHandlingAttribute defAttr = PheasantEventHandlingAttribute.values[eventAttributeMap.toList().indexOf(attr.key as String)];
+      String value = attr.value;
+      String statement = '';
+      TempPheasantRenderClass compound = pheasantEventHandlingAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
+      closebracket = compound.number;
+      statement = compound.value;
+      beginningFunc += '$statement\n';
     }
   }
   return /*beginningFunc*/ TempPheasantRenderClass(number: closebracket, value: beginningFunc);
 }
 
+TempPheasantRenderClass pheasantEventHandlingAttributes(
+  Element pheasantHtml, 
+  PheasantEventHandlingAttribute defAttr, 
+  String statement, 
+  String value, 
+  int closebracket, {
+  String elementName = 'element',
+}) {
+  String stateStatement = defaultStateAttributes.keys.contains(value) ? defaultStateAttributes[value]! : "state?.emit(event, templateState: this);";
+  switch (defAttr) {
+    case PheasantEventHandlingAttribute.p_on_abort:
+      statement = '''$elementName.onAbort.listen((event) {
+        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+        $stateStatement
+        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+      });''';
+      break;
+    case PheasantEventHandlingAttribute.p_on_click:
+      statement = '''$elementName.onClick.listen((event) {
+        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+        $stateStatement
+        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+      });''';
+      break;
+    case PheasantEventHandlingAttribute.p_on_change:
+      statement = '''$elementName.onChange.listen((event) {
+        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+        $stateStatement
+        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+      });''';
+      break;
+    case PheasantEventHandlingAttribute.p_on_keyDown:
+      statement = '''$elementName.onKeyDown.listen((event) {
+        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+        $stateStatement
+        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+      });''';
+      break;
+    case PheasantEventHandlingAttribute.p_on_keyUp:
+      statement = '''$elementName.onKeyUp.listen((event) {
+        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+        $stateStatement
+        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+      });''';
+      break;
+    default:
+  }
+  return TempPheasantRenderClass(number: closebracket, value: statement);
+}
+
+
+TempPheasantRenderClass pheasantBasicAttributes(
+  Element pheasantHtml, 
+  PheasantAttribute defAttr, 
+  String statement, 
+  String value, 
+  int closebracket, {
+  String elementName = 'element'
+}) {
+  switch (defAttr) {
+    case PheasantAttribute.p_if:
+      statement = 'if ($value) {';
+      closebracket++;
+      break;
+    case PheasantAttribute.p_while:
+      statement = 'while ($value) {';
+      closebracket++;
+      break;
+    case PheasantAttribute.p_for:
+      statement = 'for ($value) {';
+      closebracket++;
+      break;
+    case PheasantAttribute.p_html:
+      pheasantHtml.innerHtml += value; 
+      statement = '$elementName.innerHtml = $elementName.innerHtml == null ? "$value" : $elementName.innerHtml! + "$value";';
+      break;
+    case PheasantAttribute.p_text:
+      pheasantHtml.nodes.add(Text(value));
+      statement = '$elementName.append(_i2.Text("\${$value}"));';
+      break;
+    case PheasantAttribute.p_else:
+      if ((pheasantHtml.previousElementSibling?.attributes
+      .entries.map((e) => e.key) ?? []).contains('p-if')) {
+        statement = 'else {';
+        closebracket++;
+      }
+      break;
+    case PheasantAttribute.p_elseif:
+      if ((pheasantHtml.previousElementSibling?.attributes
+      .entries.map((e) => e.key) ?? []).contains('p-if')) {
+        statement = 'else if ($value) {';
+        closebracket++;
+      }
+      break;
+    default:
+  }
+  return TempPheasantRenderClass(number: closebracket, value: statement);
+}
+
+// TODO: Include added support for binding
 
 /// Function used for writing code to make and assert normal attributes in a component.
 /// 
@@ -221,8 +328,17 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
       beginningFunc += '$elementName.classes.add("${attr.value}");';
     } else if (attr.key == 'href' || attr.key == 'id') {
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
-    } else if (!PheasantAttribute.values.map((e) => e.name).contains(attr.key)){
-      beginningFunc += '$elementName.setAttribute("${attr.key as String}", ${attr.value});';
+    } else if (
+      !PheasantAttribute.values.map((e) => e.name).contains(attr.key) 
+      && !PheasantEventHandlingAttribute.values.map((e) => e.name).contains(attr.key)
+      && !(attr.key as String).contains('p-bind') && !(attr.key as String).contains('p-slot')
+    ) {
+      if (!(attr.key as String).contains('p-attach')) {
+        beginningFunc += '$elementName.setAttribute("${attr.key as String}", ${attr.value});';
+      } else {
+        beginningFunc += '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
+      }
+
     }
   }
   if (styleScoped != null && styleScoped.scoped) {

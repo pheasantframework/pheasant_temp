@@ -1,5 +1,9 @@
 import 'dart:html';
 
+import 'package:pheasant_meta/pheasant_meta.dart';
+
+import 'state/state.dart';
+
 /// The base class for all Pheasant App Components
 /// 
 /// All Pheasant app components are derived from this base class, and are used to render pheasant code internally and return the desired html app component.
@@ -42,11 +46,18 @@ abstract class PheasantTemplate {
   String? template;
 
   PheasantTemplate({required this.template});
+
+  @From('0.1.1')
+  void init() {}
+
+  @From('0.1.1')
+  void del() {}
   
   /// The `render` function.
   /// 
   /// This function accepts a single parameter: `temp` which is of type [String] which represents the desired templating string to be rendered.
   /// 
   /// The function returns a html element of type [Element].
-  Element render(String temp);
+  // TODO: Include State description.
+  Element render(String temp, [TemplateState state]);
 }

@@ -60,14 +60,100 @@ class PheasantScript {
   List<Field> get fields {
     return List.generate(varDef.length, (index) {
       final variable = varDef[index];
-      return Field((f) => f
+      var field = FieldBuilder()
       ..name = "${variable.declaration.name}"
       ..type = refer(variable.dataType)
       ..late = variable.declaration.isLate
       ..modifier = modifier(variable.declaration)
-      ..assignment = Code('${variable.declaration.initializer}')
-      );
+      ..annotations.addAll(
+        List.generate(variable.annotations.length, (index) {
+          return CodeExpression(Code(variable.annotations[index].toSource().replaceAll('@', '_i1.')));
+        })
+      )
+      ;
+      if (variable.declaration.initializer == null && !variable.dataType.contains('?')) {
+
+      } else {
+        field.assignment = Code('${variable.declaration.initializer == null && variable.dataType.contains('?') ? variable.declaration.initializer : (variable.declaration.initializer ?? "")}');
+      }
+      return field.build();
     });
+  }
+
+  // TODO: Add info on propFields
+  /// Code to get the "propFields" in a class
+  /// The propFields are fields uninitialised in a class, and therefore will be passed as parameters into the constructor.
+  List<PropField> get props {
+    List<PropField> initList = List<PropField>.generate(
+      varDef.where((element) {
+        return element.annotations.where((el) => el.name.toSource() == 'prop' || el.name.toSource() == 'Prop').isNotEmpty;
+      }).length, 
+    (index) {
+      final variable = varDef.where((element) => element.annotations
+      .where((el) => el.name.toSource() == 'prop' || el.name.toSource() == 'Prop').isNotEmpty).toList()[index];
+      var field = FieldBuilder()
+      ..name = "${variable.declaration.name}"
+      ..type = refer(variable.dataType)
+      ..late = variable.declaration.isLate
+      ..modifier = modifier(variable.declaration)
+      ;
+      if (variable.declaration.initializer == null && !variable.dataType.contains('?')) {
+
+      } else {
+        field.assignment = Code('${variable.declaration.initializer == null && variable.dataType.contains('?') ? variable.declaration.initializer : (variable.declaration.initializer ?? "")}');
+      }
+      Iterable<Annotation> propAnnotations = variable.annotations.where((element) => element.name.toSource() == 'prop' || element.name.toSource() == 'Prop');
+      return PropField(
+        fieldDef: field.build(), 
+        annotationInfo: PropAnnotationInfo(
+          data: {
+            'defaultTo': propAnnotations.first.name.toSource() == 'prop' 
+            || propAnnotations.first.arguments!.arguments.where((element) => element.beginToken.toString() == 'defaultTo').isEmpty
+            ? ''
+            : propAnnotations.first.arguments?.arguments.singleWhere((element) => element.beginToken.toString() == 'defaultTo').childEntities.last.toString(),
+            'optional': propAnnotations.first.name.toSource() == 'prop' 
+            || propAnnotations.first.arguments!.arguments.where((element) => element.beginToken.toString() == 'optional').isEmpty
+            ? false
+            : bool.parse(propAnnotations.first.arguments?.arguments.singleWhere((element) => element.beginToken.toString() == 'optional').childEntities.last.toString() ?? "false"),
+          }
+        ));
+    });
+
+    List<PropField> indirectList = List<PropField>.generate(
+      fields.where((element) {
+        return element.annotations.where((p0) {
+          return p0.toString().contains('noprop')
+          && !p0.toString().contains('prop')
+          && !p0.toString().contains('Prop')
+          ;
+        }).isEmpty
+        && element.assignment == null
+        && !((element.type?.symbol ?? 'var').contains('?') || ['var', 'final', 'const', 'dynamic'].contains(element.type?.symbol ?? 'var'))
+        && !initList.map((e) => e.fieldDef.name).contains(element.name)
+        ;
+      }).length, 
+      (index) {
+        return PropField(
+          fieldDef: fields.where((element) {
+            return element.annotations.where((p0) {
+              return p0.toString().contains('noprop')
+                && !(p0.toString() == 'prop')
+                && !(p0.toString() == 'Prop')
+                ;
+            }).isEmpty
+              && element.assignment == null
+              && !((element.type?.symbol ?? 'var').contains('?') || ['var', 'final', 'const', 'dynamic'].contains(element.type?.symbol ?? 'var'))
+              && !initList.map((e) => e.fieldDef.name).contains(element.name)
+            ;
+          }).toList()[index],
+        annotationInfo: PropAnnotationInfo(data: {
+          'defaultTo': '',
+          'optional': false
+        })
+        );
+      }
+    );
+    return (initList + indirectList);
   }
 
     /// Getter to get the methods for the desired pheasant app component.
@@ -172,7 +258,7 @@ Fix: ${result.errors.map((e) => e.correctionMessage)}
 
   for (var element in newUnit.declarations) {
     element.accept(visitor);
-    outputList.addAll(visitor.variableList);
+    outputList.addAll(visitor.variableList.map((e) => e..annotations = element.metadata));
     visitor = VariableExtractorVisitor();
   }
   return outputList;
@@ -209,4 +295,38 @@ Fix: ${result.errors.map((e) => e.correctionMessage)}
   }
   CompilationUnit newUnit = parseString(content: script).unit;
   return newUnit.directives.whereType<ImportDirective>().toList();
+}
+
+class PropField {
+  final Field fieldDef;
+  final AnnotationInfo annotationInfo;
+
+  const PropField({required this.fieldDef, required this.annotationInfo});
+
+  @override
+  String toString() => "Annotation: $annotationInfo \nField: $fieldDef";
+}
+
+class AnnotationInfo {
+  final String name;
+  final Map<String, dynamic> data;
+
+  const AnnotationInfo({required this.name, this.data = const {}});
+
+  @override
+  String toString() => "$name : $data";
+}
+
+class PropInfo {
+  final dynamic defaultTo;
+  final bool optional;
+
+  const PropInfo({this.defaultTo, this.optional = false});
+  factory PropInfo.fromMap({Map map = const {}}) {
+    return PropInfo(defaultTo: map['defaultTo'], optional: map['optional'] as bool? ?? false);
+  }
+}
+
+class PropAnnotationInfo extends AnnotationInfo{
+  const PropAnnotationInfo({super.data = const {}}) : super(name: 'prop');
 }

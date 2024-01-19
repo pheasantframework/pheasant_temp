@@ -19,6 +19,8 @@ abstract interface class PheasantAttributeType {
 /// Any other attribute not listed here is therefore placed as [PheasantAttribute.unknown].
 enum PheasantAttribute implements PheasantAttributeType {
   p_await(name: 'p-await'),
+  p_bind(name: 'p-bind'),
+  p_attach(name: 'p-attach'),
   p_html(name: 'p-html'),
   p_if(name: 'p-if'),
   p_else(name: 'p-else', dependsOn: PheasantAttribute.p_if),
@@ -45,3 +47,44 @@ enum PheasantAttribute implements PheasantAttributeType {
   @override
   final PheasantAttributeType? dependsOn;
 }
+
+// TODO: Add description for the following new classes
+
+abstract interface class PheasantEventHandlingAttributeType extends PheasantAttributeType {
+  final PheasantAttributeType basedOn;
+
+  const PheasantEventHandlingAttributeType({required super.name, required this.basedOn, super.dependsOn});
+}
+
+// TODO: Estabish means of adding and creating new attributes:
+/// 1. Make a list, and add the enum values in it, then allow for custom attributes to be added to the list.
+
+/// Enhanced Enum Class based on the [PheasantEventHandlingAttributeType] class.
+/// 
+/// These values represent attributes used for event changes, and are meant to be an extension of a few of the values/attributes in [PheasantAttribute],
+/// mainly [PheasantAttribute.p_on].
+enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeType {
+  p_on_abort(name: 'p-on:abort', basedOn: PheasantAttribute.p_on),
+  p_on_click(name: 'p-on:click', basedOn: PheasantAttribute.p_on),
+  p_on_change(name: 'p-on:change', basedOn: PheasantAttribute.p_on),
+  p_on_blur(name: 'p-on:blur', basedOn: PheasantAttribute.p_on),
+  p_on_keyUp(name: 'p-on:keyUp', basedOn: PheasantAttribute.p_on),
+  p_on_keyDown(name: 'p-on:keyDown', basedOn: PheasantAttribute.p_on),
+  p_on_mouseUp(name: 'p-on:mouseUp', basedOn: PheasantAttribute.p_on),
+  p_on_mouseDown(name: 'p-on:mouseDown', basedOn: PheasantAttribute.p_on),
+  p_on(name: 'p-on', basedOn: PheasantAttribute.p_on),
+  p_on_custom(name: 'p-on:custom', basedOn: PheasantAttribute.p_on),
+  ;
+
+  const PheasantEventHandlingAttribute({required this.name, required this.basedOn, this.dependsOn});
+
+  @override
+  final String name;
+
+  @override
+  final PheasantAttributeType basedOn;
+
+  @override
+  final PheasantAttributeType? dependsOn;
+}
+

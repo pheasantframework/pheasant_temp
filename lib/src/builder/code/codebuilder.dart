@@ -29,6 +29,9 @@ import '../code/funbuilder.dart';
 /// 4. Creates the constructor, to call super, and overrides the `template` variable from the parent class.
 /// 
 /// 5. Generates the definition for, and overrides, the `render` function in the parent class, to return an element of type `Element`
+/// 
+// TODO: Implement state and add state description to document
+// TODO: Implement slot adding
 String renderFunc({
   required String script, 
   required String template, 
@@ -99,19 +102,39 @@ String renderFunc({
         ..named = true
         )
       )
+      ..optionalParameters.addAll(
+        PheasantScript(varDef: extractVariable(script))
+        .props
+        .map<Parameter>((e) {
+          return Parameter((p) => p
+          ..named = true
+          ..toThis = true
+          ..name = e.fieldDef.name
+          ..required = !(e.annotationInfo.data['optional'] as bool)
+          ..defaultTo = e.annotationInfo.data['defaultTo'] == '' ? null : Code("${e.annotationInfo.data['defaultTo']}")
+          );
+        })
       )
+    )
     )
     // Override and generate definition for `render` function
     ..methods.add(
       Method((m) => m
       ..annotations.add(CodeExpression(Code('override')))
       ..name = 'render'
-      ..requiredParameters.add(
+      ..requiredParameters.addAll([
         Parameter((p) => p
         ..name = 'temp'
         ..type = refer('String')
+        ),
+      ])
+      ..optionalParameters.addAll([
+        // TODO: Do not forget about this thing sha
+        Parameter((p) => p
+        ..name = 'state'
+        ..type = refer('TemplateState?', 'package:pheasant/build.dart')
         )
-      )
+      ])
       ..returns = refer('Element', 'dart:html')
       ..docs.addAll(['  // Override function for creating an element'])
       ..body = renderRenderFunc(

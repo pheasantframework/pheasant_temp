@@ -68,6 +68,13 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
       throw PheasantTemplateException('Error while parsing markdown: $e \nStack Trace: $s');
     }
     beginningFunc += "_i2.Element element = _i2.Element.div()..innerHtml = '''$switchedHtml''';";
+    Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
+    beginningFunc = renderElement(
+      beginningFunc, 
+      pheasantHtml, 
+      attrmap, 
+      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath)
+    );
     beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
   } else {
 
