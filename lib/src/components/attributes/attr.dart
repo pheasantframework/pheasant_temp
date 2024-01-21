@@ -20,7 +20,6 @@ abstract interface class PheasantAttributeType {
 enum PheasantAttribute implements PheasantAttributeType {
   p_await(name: 'p-await'),
   p_bind(name: 'p-bind'),
-  p_attach(name: 'p-attach'),
   p_html(name: 'p-html'),
   p_if(name: 'p-if'),
   p_else(name: 'p-else', dependsOn: PheasantAttribute.p_if),
@@ -68,11 +67,18 @@ enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeTyp
   p_on_click(name: 'p-on:click', basedOn: PheasantAttribute.p_on),
   p_on_change(name: 'p-on:change', basedOn: PheasantAttribute.p_on),
   p_on_blur(name: 'p-on:blur', basedOn: PheasantAttribute.p_on),
+  p_on_beforeCopy(name: 'p-on:beforeCopy', basedOn: PheasantAttribute.p_on),
+  p_on_beforeCut(name: 'p-on:beforeCut', basedOn: PheasantAttribute.p_on),
+  p_on_beforePaste(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
+  p_on_canPlay(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
+  p_on_canPlayThrough(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
   p_on_keyUp(name: 'p-on:keyUp', basedOn: PheasantAttribute.p_on),
   p_on_keyDown(name: 'p-on:keyDown', basedOn: PheasantAttribute.p_on),
   p_on_mouseUp(name: 'p-on:mouseUp', basedOn: PheasantAttribute.p_on),
   p_on_mouseDown(name: 'p-on:mouseDown', basedOn: PheasantAttribute.p_on),
+  p_on_input(name: 'p-on:input', basedOn: PheasantAttribute.p_on),
   p_on(name: 'p-on', basedOn: PheasantAttribute.p_on),
+  p_on_ended(name: 'p-on:ended', basedOn: PheasantAttribute.p_on),
   p_on_custom(name: 'p-on:custom', basedOn: PheasantAttribute.p_on),
   ;
 

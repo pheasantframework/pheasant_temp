@@ -221,49 +221,19 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
   String elementName = 'element',
 }) {
   String stateStatement = defaultStateAttributes.keys.contains(value) ? defaultStateAttributes[value]! : "state?.emit(event, templateState: this);";
-  switch (defAttr) {
-    case PheasantEventHandlingAttribute.p_on_abort:
-      statement = '''$elementName.onAbort.listen((event) {
-        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
-        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
-        $stateStatement
-        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
-      });''';
-      break;
-    case PheasantEventHandlingAttribute.p_on_click:
-      statement = '''$elementName.onClick.listen((event) {
-        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
-        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
-        $stateStatement
-        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
-      });''';
-      break;
-    case PheasantEventHandlingAttribute.p_on_change:
-      statement = '''$elementName.onChange.listen((event) {
-        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
-        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
-        $stateStatement
-        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
-      });''';
-      break;
-    case PheasantEventHandlingAttribute.p_on_keyDown:
-      statement = '''$elementName.onKeyDown.listen((event) {
-        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
-        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
-        $stateStatement
-        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
-      });''';
-      break;
-    case PheasantEventHandlingAttribute.p_on_keyUp:
-      statement = '''$elementName.onKeyUp.listen((event) {
-        ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
-        ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
-        $stateStatement
-        ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
-      });''';
-      break;
-    default:
-  }
+  String eventStatement = defAttr.name.replaceAll('p-', '').split(':').map((e) {
+    if (e != 'on') {
+      String statement = e;
+      e = statement.replaceFirst(statement[0], statement[0].toUpperCase());
+    }
+    return e;
+  }).join();
+  statement = '''$elementName.$eventStatement.listen((event) {
+    ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+    ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+    $stateStatement
+    ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
+  });''';
   return TempPheasantRenderClass(number: closebracket, value: statement);
 }
 
@@ -338,7 +308,6 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
       } else {
         beginningFunc += '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
-
     }
   }
   if (styleScoped != null && styleScoped.scoped) {
