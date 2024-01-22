@@ -1,8 +1,12 @@
-import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/analysis/utilities.dart' show parseString;
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
-import 'package:code_builder/code_builder.dart';
-import 'package:pheasant_temp/src/exceptions/exceptions.dart';
+import 'package:code_builder/code_builder.dart' 
+  show Code, CodeExpression, Directive, DirectiveBuilder, Field, FieldBuilder, Method, MethodType, Parameter, refer;
+
+import 'metadata/props.dart';
+
+import '../../exceptions/exceptions.dart';
 
 import '../analyze/imports/combinators.dart';
 import '../analyze/imports/extension.dart';
@@ -60,17 +64,109 @@ class PheasantScript {
   List<Field> get fields {
     return List.generate(varDef.length, (index) {
       final variable = varDef[index];
-      return Field((f) => f
+      var field = FieldBuilder()
       ..name = "${variable.declaration.name}"
       ..type = refer(variable.dataType)
       ..late = variable.declaration.isLate
       ..modifier = modifier(variable.declaration)
-      ..assignment = Code('${variable.declaration.initializer}')
-      );
+      ..annotations.addAll(
+        List.generate(variable.annotations.length, (index) {
+          return CodeExpression(Code(variable.annotations[index].toSource().replaceAll('@', '_i1.')));
+        })
+      )
+      ;
+      if (variable.declaration.initializer == null && !variable.dataType.contains('?')) {
+
+      } else {
+        field.assignment = Code('${variable.declaration.initializer == null && variable.dataType.contains('?') ? variable.declaration.initializer : (variable.declaration.initializer ?? "")}');
+      }
+      return field.build();
     });
   }
 
-    /// Getter to get the methods for the desired pheasant app component.
+  /// Code to get the "prop fields" in a class
+  /// The prop fields are fields uninitialised in a class, and therefore will be passed as parameters into the constructor.
+  /// 
+  /// These fields are encapsulated in a [PropField] class, which gives relevant information as to how these fields are presented in the constructor.
+  /// 
+  /// These feilds are usually denoted with an `@prop` or `@Prop()` annotation on them. 
+  /// By default all uninitialised variables, except those bearing an `@noprop` annotation are passed as props. 
+  /// 
+  /// The `@Prop()` annotation helps define the kind of prop field it is (whether it has a default value or not), and this information is stored in the [PropField] class.
+  List<PropField> get props {
+    List<PropField> initList = List<PropField>.generate(
+      varDef.where((element) {
+        return element.annotations.where((el) => el.name.toSource() == 'prop' || el.name.toSource() == 'Prop').isNotEmpty;
+      }).length, 
+    (index) {
+      final variable = varDef.where((element) => element.annotations
+      .where((el) => el.name.toSource() == 'prop' || el.name.toSource() == 'Prop').isNotEmpty).toList()[index];
+      var field = FieldBuilder()
+      ..name = "${variable.declaration.name}"
+      ..type = refer(variable.dataType)
+      ..late = variable.declaration.isLate
+      ..modifier = modifier(variable.declaration)
+      ;
+      if (variable.declaration.initializer == null && !variable.dataType.contains('?')) {
+
+      } else {
+        field.assignment = Code('${variable.declaration.initializer == null && variable.dataType.contains('?') ? variable.declaration.initializer : (variable.declaration.initializer ?? "")}');
+      }
+      Iterable<Annotation> propAnnotations = variable.annotations.where((element) => element.name.toSource() == 'prop' || element.name.toSource() == 'Prop');
+      return PropField(
+        fieldDef: field.build(), 
+        annotationInfo: PropAnnotationInfo(
+          data: {
+            'defaultTo': propAnnotations.first.name.toSource() == 'prop' 
+            || propAnnotations.first.arguments!.arguments.where((element) => element.beginToken.toString() == 'defaultTo').isEmpty
+            ? ''
+            : propAnnotations.first.arguments?.arguments.singleWhere((element) => element.beginToken.toString() == 'defaultTo').childEntities.last.toString(),
+            'optional': propAnnotations.first.name.toSource() == 'prop' 
+            || propAnnotations.first.arguments!.arguments.where((element) => element.beginToken.toString() == 'optional').isEmpty
+            ? false
+            : bool.parse(propAnnotations.first.arguments?.arguments.singleWhere((element) => element.beginToken.toString() == 'optional').childEntities.last.toString() ?? "false"),
+          }
+        ));
+    });
+
+    List<PropField> indirectList = List<PropField>.generate(
+      fields.where((element) {
+        return element.annotations.where((p0) {
+          return p0.toString().contains('noprop')
+          && !p0.toString().contains('prop')
+          && !p0.toString().contains('Prop')
+          ;
+        }).isEmpty
+        && element.assignment == null
+        && !((element.type?.symbol ?? 'var').contains('?') || ['var', 'final', 'const', 'dynamic'].contains(element.type?.symbol ?? 'var'))
+        && !initList.map((e) => e.fieldDef.name).contains(element.name)
+        ;
+      }).length, 
+      (index) {
+        return PropField(
+          fieldDef: fields.where((element) {
+            return element.annotations.where((p0) {
+              return p0.toString().contains('noprop')
+                && !(p0.toString() == 'prop')
+                && !(p0.toString() == 'Prop')
+                ;
+            }).isEmpty
+              && element.assignment == null
+              && !((element.type?.symbol ?? 'var').contains('?') || ['var', 'final', 'const', 'dynamic'].contains(element.type?.symbol ?? 'var'))
+              && !initList.map((e) => e.fieldDef.name).contains(element.name)
+            ;
+          }).toList()[index],
+        annotationInfo: PropAnnotationInfo(data: {
+          'defaultTo': '',
+          'optional': false
+        })
+        );
+      }
+    );
+    return (initList + indirectList);
+  }
+
+  /// Getter to get the methods for the desired pheasant app component.
   /// 
   /// This method translates the ast definition [funDef] stored in the class to the `code_builder` type [Method] to use in the `renderFunc` function.
   List<Method> get methods {
@@ -172,7 +268,7 @@ Fix: ${result.errors.map((e) => e.correctionMessage)}
 
   for (var element in newUnit.declarations) {
     element.accept(visitor);
-    outputList.addAll(visitor.variableList);
+    outputList.addAll(visitor.variableList.map((e) => e..annotations = element.metadata));
     visitor = VariableExtractorVisitor();
   }
   return outputList;
@@ -210,3 +306,4 @@ Fix: ${result.errors.map((e) => e.correctionMessage)}
   CompilationUnit newUnit = parseString(content: script).unit;
   return newUnit.directives.whereType<ImportDirective>().toList();
 }
+

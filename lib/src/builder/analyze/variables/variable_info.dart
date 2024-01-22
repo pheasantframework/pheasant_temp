@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/ast.dart' show Annotation, VariableDeclaration;
 
 /// The class used as an encapsulated extension for [VariableDeclaration]
 /// 
@@ -6,6 +6,10 @@ import 'package:analyzer/dart/ast/ast.dart';
 class VariableDefinition {
   VariableDeclaration declaration;
   String dataType;
+  List<Annotation> annotations;
   
-  VariableDefinition({required this.declaration, required this.dataType});
+  VariableDefinition({required this.declaration, required this.dataType, this.annotations = const []});
+
+  @override
+  String toString() => "$dataType $declaration";
 }

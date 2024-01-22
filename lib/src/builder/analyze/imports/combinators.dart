@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/ast.dart' show ImportDirective;
 
 /// Function to get the items placed in a `show` combinator in an import directive.
 /// 

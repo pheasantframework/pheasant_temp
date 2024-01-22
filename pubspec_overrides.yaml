@@ -1,0 +1,3 @@
+dependency_overrides:
+  pheasant_meta:
+    path: ../pheasant_meta
