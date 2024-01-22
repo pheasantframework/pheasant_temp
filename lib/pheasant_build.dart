@@ -13,5 +13,4 @@ library pheasant_build;
 
 export 'src/base.dart';
 export 'src/state/state.dart' hide StateTarget, ChangeEmitter, ChangeReceiver, ExtraFunctionality, TimedState;
-export 'package:pheasant_meta/src/meta/metadata.dart';
 export 'package:pheasant_meta/src/meta/pheasant_temp/props.dart' hide BuildAnnotationObject;
