@@ -1,7 +1,8 @@
-import 'package:analyzer/dart/analysis/utilities.dart';
+import 'package:analyzer/dart/analysis/utilities.dart' show parseString;
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
-import 'package:code_builder/code_builder.dart';
+import 'package:code_builder/code_builder.dart' 
+  show Code, CodeExpression, Directive, DirectiveBuilder, Field, FieldBuilder, Method, MethodType, Parameter, refer;
 
 import 'metadata/props.dart';
 

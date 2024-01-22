@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/ast.dart' show Annotation, VariableDeclaration;
 
 /// The class used as an encapsulated extension for [VariableDeclaration]
 /// 

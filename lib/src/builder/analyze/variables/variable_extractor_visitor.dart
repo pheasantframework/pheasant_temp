@@ -1,5 +1,5 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/ast/ast.dart' show CompilationUnit, VariableDeclaration, VariableDeclarationList;
+import 'package:analyzer/dart/ast/visitor.dart' show RecursiveAstVisitor;
 import 'variable_info.dart';
 
 /// Visitor used to get variables from a [CompilationUnit]

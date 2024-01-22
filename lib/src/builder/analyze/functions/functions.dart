@@ -1,4 +1,4 @@
-import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/ast.dart' show CompilationUnit, FunctionDeclaration;
 
 /// Function used for extracting function info from a [CompilationUnit] and then return a List of [FunctionDeclaration] containing these declarations.
 List<FunctionDeclaration> extractFunctions(CompilationUnit unit) {

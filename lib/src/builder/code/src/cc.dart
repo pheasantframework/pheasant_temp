@@ -1,6 +1,6 @@
-import 'package:html/dom.dart';
+import 'package:html/dom.dart' show Element, Node;
 
-import 'package:pheasant_meta/pheasant_meta.dart';
+import 'package:pheasant_meta/pheasant_meta.dart' show AltVersion;
 
 /// Function to help in serving custom components
 /// 
@@ -35,7 +35,7 @@ List<Element> findAllElements(Node root, String tagName) {
 
 
 @AltVersion('findAllElements', version: '0.3.0')
-List<Element> findAllElementsNonRecursive(Node root, String tagName) {
+List<Element> _findAllElementsNonRecursive(Node root, String tagName) {
   List<Element> result = [];
   List<Node> stack = [root];
 

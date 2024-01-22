@@ -1,4 +1,4 @@
-import 'package:pheasant_meta/pheasant_meta.dart';
+import 'package:pheasant_meta/pheasant_meta.dart' show nohtml5;
 
 /// Enhanced Enum Set for the types of components that can be rendered in the Pheasant File
 /// 

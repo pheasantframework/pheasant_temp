@@ -1,6 +1,7 @@
-import 'package:code_builder/code_builder.dart';
-import 'package:dart_style/dart_style.dart';
-import 'package:pheasant_assets/pheasant_assets.dart';
+import 'package:code_builder/code_builder.dart' 
+  show Class, Code, CodeExpression, Constructor, DartEmitter, Field, LibraryBuilder, Method, Parameter, refer;
+import 'package:dart_style/dart_style.dart' show DartFormatter;
+import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, scopeComponents;
 
 import '../analyze/analyze.dart';
 

@@ -1,5 +1,5 @@
-import 'package:pheasant_meta/pheasant_meta.dart';
-import '../../../components/attributes/attr.dart';
+import 'package:pheasant_meta/pheasant_meta.dart' show From;
+import '../../../components/attributes/attr.dart' show PheasantEventHandlingAttribute;
 
 
 /// Pre-defined functions that can be used to manipulate the state of an object.

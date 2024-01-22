@@ -1,10 +1,10 @@
-import 'package:html/dom.dart';
+import 'package:html/dom.dart' show Element, Text;
 import 'package:markdown/markdown.dart' show markdownToHtml;
-import 'package:pheasant_assets/pheasant_assets.dart';
-import 'package:pheasant_temp/src/builder/code/src/events.dart';
+import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, PheasantStyleScoped;
 
+import 'events.dart' show defaultStateAttributes;
 import '../../code/src/tempclass.dart';
-import '../../../components/attributes/attr.dart';
+import '../../../components/attributes/attr.dart' show PheasantAttribute, PheasantEventHandlingAttribute;
 
 /// This is the much rather recursive function used in rendering the element variable.
 /// 

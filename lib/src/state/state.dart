@@ -1,7 +1,7 @@
-import 'dart:async';
-import 'dart:html';
+import 'dart:async' show Future, Stream, StreamController;
+import 'dart:html' show Event;
 
-import 'package:pheasant_meta/pheasant_meta.dart';
+import 'package:pheasant_meta/pheasant_meta.dart' show From, PheasantUnimplementedError;
 
 import '../base.dart';
 
