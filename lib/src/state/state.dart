@@ -5,24 +5,51 @@ import 'package:pheasant_meta/pheasant_meta.dart';
 
 import '../base.dart';
 
-// TODO: Write documentation for all these
-
+/// Mixin for base definition of state control functions.
+/// 
+/// The functions defined in this mixin represent the base functions required to represent state management and state control.
+/// These functions are used to show characteristics of state, such as pausing state via `freeze`, unpausing state via `unfreeze` and refreshing state via `reload`. 
 mixin StateControl {
+  /// Function used to freeze state.
+  /// 
+  /// When this function is called, the state of the desired object is paused, and so state changes are no longer implemented until state is unfrozen via the [unfreeze] function.
   void freeze();
 
+  /// Function used to unfreeze state.
+  /// 
+  /// When this function is called, the state of the desired object is unpaused, and so state changes can now be implemented.
   void unfreeze();
 
+  /// Function used to refresh or reload state.
+  /// 
+  /// When this function is called, the state of the desired object is refreshed back to its initial state, and so state changes are either cleared, or redirected back to initial state.
   void reload();
 }
 
+/// This is a mixin used to define base functions used in controlling state in a component. 
+/// 
+/// In components, state is used and watched constantly, and so these are base function definitions of functions used in component states, alongside the [StateControl] mixin.
+/// 
+/// These functions are [applyState], which are used to copy and paste state from one phase or part of the component to another; and [dispose].
 mixin ComponentStateControl {
+  /// Function used in making a copy of the current state of an object to be implemented elsewhere in code.
   void applyState();
 
+  /// Function used in disposing current component state, and disposing of any broadcast streams used in the process.
   void dispose();
 }
 
+/// The base class to represent State in an object.
+/// 
+/// This is the smallest representation of state in the Pheasant Framework. It is a generic class containing base functionality used to represent how state is controlled and managed in an application.
+/// 
+/// In this base class, we get to see a small representation of state management via the implementation of [initValue], [currentValue] and [previousValue], as well as the function [change].
+/// 
+/// This class is extended, implemented and used in other classes for state control, and is directly used by [StateObject], where most of the defined functions are implemented.
 abstract class State<T> with StateControl {
-  T initValue;
+  /// The initial value of the variable.
+  final T initValue;
+
   late T _previousValue;
   // ignore: prefer_final_fields
   late T _currentValue;
@@ -31,22 +58,39 @@ abstract class State<T> with StateControl {
   _currentValue = newValue ?? initValue,
   _previousValue = initValue
   ;
-
+  /// The current value of the variable
   T get currentValue => _currentValue;
 
+  /// The previous value of the variable
   T get previousValue => _previousValue;
 
-  void change(T newValue);
+  /// Function used to change state.
+  /// 
+  /// This function receives the new value of state and preforms changes to the [currentValue] and the [previousValue].
+  void change(T newValue, {StateChange<T>? stateChange});
 }
 
+/// Class used to represent state changes in an application.
+/// 
+/// Whenever state changes, the changes that occur during the state transition are encapsulated in a [StateChange] class. 
+/// This class encapsulates data such as the [Event] that caused this change, the [StateTarget], and the [newValue] created from this state change.
+/// 
+/// This class is not used directly in the application, but used as a means of state change transmission in a component state object like [AppState].
 class StateChange<T> {
+  /// The event that triggered the state change
   Event? triggerEvent;
+
+  /// The new value of the variable changed during the state change
   T? newValue;
   dynamic Function(dynamic)? stateChanger;
+
+  
   StateTarget? _target;
 
+  /// The target of the state change.
   StateTarget? get target => _target;
 
+  /// Whether the state change has a target or not
   bool get targetless => _target == null;
 
   StateChange({
@@ -55,11 +99,20 @@ class StateChange<T> {
     this.stateChanger,
     StateTarget? target,
   }) : _target = target;
+
+  /// Constructor to initalise "no change" or an empty state change.
   StateChange.empty() : triggerEvent = null, newValue = null;
 }
 
+// TODO: Implement this class
 class StateTarget {}
 
+/// This is the class that makes use of the [State] class, with proper definitions of overriden functions from [State].
+/// 
+/// This class is used directly in other component state classes in instantiating state on a value, or variable defined with type [T]. 
+/// The state of such variable is recorded by instantiating its [initValue], and then updating the [currentValue] via changes recorded by [change].
+/// 
+/// Concrete implementations of [freeze], [unfreeze] and [reload] are given here.
 class StateObject<T> extends State<T> {
   bool _changeable = true;
 
@@ -70,7 +123,7 @@ class StateObject<T> extends State<T> {
   StateObject({required super.initValue, T? newValue}) : _currentValue = newValue ?? initValue;
 
   @override
-  void change(T newValue) {
+  void change(T newValue, {StateChange<T>? stateChange}) {
     if (_changeable) { _previousValue = _currentValue; _currentValue = newValue; }
   }
 
@@ -85,14 +138,24 @@ class StateObject<T> extends State<T> {
     change(initValue);
   }
 }
-/** I'll decide which one to use between [State] and [StateObject] later */
+/// The base component state class used in controlling state in a component or object.
+/// 
+/// This class contains much more concrete ways of controlling, handling and watching state in a component through the use of streams.
+/// These streams watch for state changes and then are updated whenever a state change is received. 
+/// 
+/// This object also encapsulates the state of the component via the [State] object.
+/// 
+/// This object makes use of the [ComponentStateControl] mixin as well as the [StateControl] mixin to create implementations of functions required for state changes.
 class ElementState<T> extends State<T> with StateControl, ComponentStateControl {
   final StreamController<StateChange<T>> _stateController = StreamController<StateChange<T>>.broadcast();
 
+  /// A [Stream] of state changes used and updated for watching over changes in state of the element or component.
   Stream<StateChange<T>> get stateStream => _stateController.stream;
 
+  /// The current state of the component as a [State] object.
   State<T> componentState;
 
+  /// The component
   T component;
 
   ElementState({required this.component, State<T>? state}) : componentState = state ?? StateObject<T>(initValue: component), super(initValue: component);
@@ -107,37 +170,43 @@ class ElementState<T> extends State<T> with StateControl, ComponentStateControl 
     componentState.reload();
   }
   
+  @From('0.1.3')
   @override
   void applyState() {
-    // TODO: implement applyState
+    throw PheasantUnimplementedError('Not yet implemented yet');
   }
   
   @override
   void unfreeze() {
-    // TODO: implement unfreeze
+    componentState.unfreeze();
   }
   
   @override
   void dispose() {
-    // TODO: implement dispose
+    _stateController.close();
   }
   
   @override
-  void change(T newValue) {
-    // TODO: implement change
+  void change(T newValue, {StateChange<T>? stateChange}) {
+    componentState.change(newValue, stateChange: stateChange);
+    _stateController.add(stateChange ?? StateChange(triggerEvent: null, newValue: newValue));
   }
 }
 
 
-
+/// Class used in encapsulating the emission of state changes.
+/// 
+/// This class is used in controlling the emission of changes in state to a variable, with functions like [emit] and [emitStream].
 class ChangeEmitter<T> {
   final _valueController = StreamController<T>.broadcast();
 
-  // Stream for listening to variable value changes
+  /// Stream for listening to variable value changes
   late Stream<T> emittedStream = _valueController.stream;
 
+  /// Function used in emitting state changes
   void emit() {}
 
+  /// Function used in emitting a stream of state changes
   void emitStream(Stream<T> stream, /*ChangeReceiver<T> receiver*/) {
     emittedStream = stream;
   }
@@ -147,28 +216,42 @@ class ChangeEmitter<T> {
   }
 } 
 
+/// Class used in encapsulating the emission of state changes.
+/// 
+/// This class is used in controlling the emission of changes in state to a variable, with functions like [emit] and [emitStream].
 class ChangeReceiver<T> {
   final _valueController = StreamController<T>.broadcast();
 
   // Stream for listening to variable value changes
   Stream<T> get receivedStream => _valueController.stream;
 
+  /// Function used in receiving state changes
   void receive() {}
 
-  void receiveStream() {}
+  /// Function used in emitting a stream of state changes
+  void receiveStream(Stream<T> stream, /*ChangeReceiver<T> receiver*/) {}
 
   void dispose() {
     _valueController.close();
   }
 }
 
+/// A state watcher class
+/// 
+/// This class is used in watching variables for state changes, and is able to recieve and emit state changes.
+/// 
+/// This is used in watching specific variables that can be referenced by their type [T] and their initial value [initValue]
 class ChangeWatcher<T> with StateControl, ComponentStateControl implements ChangeEmitter<T>, ChangeReceiver<T> {
+  /// The initial value of the watched variable.
   T initValue;
 
+  /// The state of the watched variable
   State<T> initialState;
 
+  /// The current state change that has occured on the watched variable and [initialState], or `null` if there have been no recent changes.
   StateChange<T>? currentStateChange;
 
+  /// The current value of the watched variable
   T get currentValue => initialState.currentValue;
 
   bool _freeze = false;
@@ -182,13 +265,17 @@ class ChangeWatcher<T> with StateControl, ComponentStateControl implements Chang
   void receive() {}
 
   Future<State<T>> get currentState async => StateObject(initValue: initValue)..change(await _valueController.stream.last);
-  // StreamController to handle variable value changes
+
+  /// [StreamController] to handle variable value changes
+  @override
   final _valueController = StreamController<T>.broadcast();
 
-  // Stream for listening to variable value changes
+  /// Stream for listening to variable value changes
   Stream<T> get valueStream => _valueController.stream;
 
-  // Function to watch the variable
+  /// Function used to watch the variable for changes.
+  /// 
+  /// This function checks for changes in the variable and streams state changes whenver a change is denoted.
   void watchVariable(T variable) {
     if (!_freeze) {
       // Notify listeners whenever the variable changes
@@ -210,7 +297,7 @@ class ChangeWatcher<T> with StateControl, ComponentStateControl implements Chang
     _valueController.add(initValue);
   }
 
-  // Dispose method to close the stream when no longer needed
+  /// Dispose method to close the stream when no longer needed
   @override
   void dispose() {
     _freeze = false;
@@ -219,7 +306,8 @@ class ChangeWatcher<T> with StateControl, ComponentStateControl implements Chang
   
   @override
   void unfreeze() {
-    // TODO: implement unfreeze
+    _valueController.stream.listen((event) {}).resume();
+    _freeze = false;
   }
   
   @override
@@ -236,7 +324,7 @@ class ChangeWatcher<T> with StateControl, ComponentStateControl implements Chang
   Stream<T> get emittedStream => throw UnimplementedError("Watcher can only have one stream");
   
   @override
-  void receiveStream() {
+  void receiveStream(Stream<T> stream, /*ChangeReceiver<T> receiver*/) {
     // TODO: implement receiveStream
   }
   
@@ -244,11 +332,16 @@ class ChangeWatcher<T> with StateControl, ComponentStateControl implements Chang
   Stream<T> get receivedStream => throw UnimplementedError("Watcher can only have one stream");
   
   @override
-  set emittedStream(Stream<T> _emittedStream) {
+  set emittedStream(Stream<T> emittedStream) {
     throw UnimplementedError("Watcher can only have one stream");
   }
 }
 
+/// The class used in Pheasant Template Components. This class extends the base class [ElementState] with functionality used directly in controlling state in an application.
+/// 
+/// In every pheasant state object, there is an emitter - [ChangeEmitter] - and a receiver [ChangeReceiver] - used in receiving and emitting changes.
+/// 
+/// This object has the ability to do most of the state functionality that can be done in an [ElementState] or [StateObject] object, but has a few additional functions like [emit] and [receive].
 class TemplateState extends ElementState<PheasantTemplate> {
   TemplateState({
     required super.component,
@@ -261,16 +354,26 @@ class TemplateState extends ElementState<PheasantTemplate> {
 
   bool _frozen = false;
 
+  /// Whether the state has been paused or not
   bool get onPause => _frozen;
 
+  /// The initial state of the component - used to initialise state in a pheasant component
   PheasantTemplate initState;
+
+  /// The disposing state
   PheasantTemplate? disposeState;
 
   ChangeEmitter emitter;
   ChangeReceiver receiver;
 
+  /// Function used to emit state changes in a [PheasantTemplate] object.
+  /// 
+  /// This function creates, emits and registers a [StateChange] by making use of [event] and [templateState].
+  /// 
+  /// The function then registers the change and adds it to the [Stream].
   void emit(Event event, {PheasantTemplate? templateState}) {}
 
+  /// Function used to receive state changes in a [PheasantTemplate] object.
   void receive<T>(StateChange stateChange, T refVariable) {}
 
   @override
@@ -282,43 +385,15 @@ class TemplateState extends ElementState<PheasantTemplate> {
 
 /// Object to represent the application's state
 /// 
-/// IDEAS:
-/// - `state.emit(Event e, )` - emit state change due to fired event
-/// - `state.stateChange` - the current state change
-/// - `state.reload()` - reload state back to init state
-/// - `state.freeze()` - hold state on pause
-/// - `state.receive(Event e, StateChange change, )` - receive a state change due to a fired event
-/// - `state.watch(Element element, )` - watch an element for changes in state
-/// - `state.changes()` - get stream of changes since app was created.
-/// - `state.dispose()` - dispose changes
-/// - `state.register(ChangeWatcher<T> item, State currentState, T variable)` - registers a watcher to watch for changes in a variable
-/// - `state.applyChanges()` - apply state changes incase for the application (usually during reload or something like that)
+/// This object represents the whole Pheasant Application State, and contains all functionality needed for controlling state in a pheasant application.
 /// 
-/// ```dart
-/// // Functions have changed
-/// void renderElement(PheasantTemplate app) {
-///   AppState state = AppState(app);
-///   Element elementApp = pheasantTemplate.render(pheasantTemplate.template!, appState: state);
-///   
-///   state.changes.listen((value) {
-///     Element elementApp = pheasantTemplate.render(pheasantTemplate.template!, appState: state);
-///     querySelector('#output')?.children.first = elementApp;
-///   })
+/// This object contains functionality to control state throughout an application, and also contains a list of [ChangeWatcher]s to watch for changes throughout the cycle of an application.
 /// 
-///   querySelector('#output')?.children.add(elementApp);
-///   
-///   
-/// }
-/// void createApp(PheasantTemplate pheasantTemplate, /* {AppState? state} - still thinking about it*/) {
-///   renderElement(pheasantTemplate.render(pheasantTemplate.template!));
-/// }
-/// 
-/// ```
-/// 
-/// Allow backwards compatibility for static sites (sites not containing changes)
-/// 
-/// FUTURE: Implement focused changes on variables
+/// The object can emit, receive, register changes and more for the application. 
 class AppState extends TemplateState {
+  
+  
+  /// The initial state of the application
   @override
   // ignore: overridden_fields
   State<PheasantTemplate> componentState;
@@ -327,6 +402,7 @@ class AppState extends TemplateState {
 
   State<PheasantTemplate> get currentState => componentState;
   
+  /// The watchers used to watch changes in an application.
   List<ChangeWatcher> watchers = [];
 
   AppState({
@@ -340,9 +416,10 @@ class AppState extends TemplateState {
   super(initState: initState, component: component, disposeState: disposeState)
   ;
 
+  /// The current state change in an application
   StateChange<PheasantTemplate> get stateChange => _stateChange;
 
-  // Stream for listening to state changes
+  /// Stream for listening to state changes
   @override
   Stream<StateChange<PheasantTemplate>> get stateStream => _stateController.stream;
 
@@ -364,10 +441,12 @@ class AppState extends TemplateState {
     }
   }
 
+  /// Function used to register and add a [ChangeWatcher] for the application
   void registerWatcher<T>(State<T> variableState, T variable, {ChangeWatcher<T>? watcher}) {
     watchers.add(watcher ?? ChangeWatcher<T>(initValue: variable, state: variableState));
   }
 
+  /// Function used to remove a [ChangeWatcher]
   void removeWatcher<T>(ChangeWatcher watcher, {T? reference}) {
     watchers.removeWhere((element) => element == watcher);
   }
@@ -424,3 +503,5 @@ extension TimedState on ComponentStateControl {
 /// other annotations: `@binding`, `@observe`, 
 // @state
 // var num = 9;
+
+// TODO: Add segmented state and state for certain components only

@@ -6,17 +6,17 @@ import 'package:pheasant_temp/src/builder/code/src/events.dart';
 import '../../code/src/tempclass.dart';
 import '../../../components/attributes/attr.dart';
 
-// TODO: Write comments for new functions, and event change comments
-
 /// This is the much rather recursive function used in rendering the element variable.
 /// 
 /// In this function, the following, in order are performed:
 /// 
-/// 1. The attributes of the element are rendered and functionality added to the code body - [basicAttributes].
+/// 1. The attributes of the element are rendered and functionality added to the code body - [basicAttributes]. 
+/// In addition, a scoped class name is added with the help of the [PheasantStyleScoped] class for scoping styles stated or referenced in the `style` tag in the pheasant file.
 /// 
 /// 2. The special pheasant attributes of the element are rendered and functionality added to the code body - [pheasantAttributes].
 /// 
 /// 3. The children of the element - both text nodes and elements - are rendered in recursive order (from 1) and added to the parent - [attachChildren].
+/// This could also include the passing of data to the child element via `p-attach` as constructors to custom child components.
 /// 
 /// In this function, [beginningFunc] is an alias for the code body (to be modified and returned under the same name). 
 /// [pheasantHtml] is the parsed Html we are using to generate functionality to modify `beginningFunc`.
@@ -66,19 +66,23 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
   return beginningFunc;
 }
 
-// TODO: Add docs for the extended custom component control.
-
 /// This function is used to render and attach children - both text nodes and elements - to their parents and reflect the functionality for the code.
 /// 
 /// This function modifies [beginningFunc] through the help of [pheasantHtml] and therefore, returns the modified version of it.
 /// 
 /// In this function, text nodes are attached via [Element.append] to the element, and changes are reflected as shown. Any remaining interpolation (`{{}}`) is replaced by the desired variable or value.
 /// 
+/// 
 /// Element nodes are first of all rendered by calling [childFun] to render the element and its children in the desired way. 
 /// By default, [childFun] is equal to the standard rendering function [renderElement]
 /// 
 /// For the case of custom components, the [nonDartImports] map contains the key-value pair representing the name and import path of the custom components.
 /// These custom components are simply rendered by calling their desired `render` function, and then attaching the returned [Element] to the parent.
+/// 
+/// If there is the presence of a `p-bind` attribute in the tag, then the referenced name is passed as name-value areguments to the custom component constructor. 
+/// This helps to achieve data passing and binding between parent and child.
+/// 
+/// IF the custom component contains children, then this is passed to the `slot`s defined in the custom component.
 String attachChildren(
   Element? pheasantHtml, 
   String beginningFunc, 
@@ -212,6 +216,7 @@ TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, String beginni
   return /*beginningFunc*/ TempPheasantRenderClass(number: closebracket, value: beginningFunc);
 }
 
+/// Function for handling pheasant atttributes dealing with event handling.
 TempPheasantRenderClass pheasantEventHandlingAttributes(
   Element pheasantHtml, 
   PheasantEventHandlingAttribute defAttr, 
@@ -237,7 +242,7 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
   return TempPheasantRenderClass(number: closebracket, value: statement);
 }
 
-
+/// Function for switching and handling basic pheasant attributes.
 TempPheasantRenderClass pheasantBasicAttributes(
   Element pheasantHtml, 
   PheasantAttribute defAttr, 
@@ -286,12 +291,12 @@ TempPheasantRenderClass pheasantBasicAttributes(
   return TempPheasantRenderClass(number: closebracket, value: statement);
 }
 
-// TODO: Include added support for binding
-
 /// Function used for writing code to make and assert normal attributes in a component.
 /// 
 /// This function asseses the [Element] named [pheasantHtml] and then iterates through the attributes in the element. 
 /// It then adds the appropriate line of code to render it.
+/// 
+/// It also specially renderes certain attributes like `p-attach` for instance.
 String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (attr.key == 'class' || attr.key == 'className') {

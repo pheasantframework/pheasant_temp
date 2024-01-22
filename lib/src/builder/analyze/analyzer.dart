@@ -2,7 +2,10 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
 import 'package:code_builder/code_builder.dart';
-import 'package:pheasant_temp/src/exceptions/exceptions.dart';
+
+import 'metadata/props.dart';
+
+import '../../exceptions/exceptions.dart';
 
 import '../analyze/imports/combinators.dart';
 import '../analyze/imports/extension.dart';
@@ -80,9 +83,15 @@ class PheasantScript {
     });
   }
 
-  // TODO: Add info on propFields
-  /// Code to get the "propFields" in a class
-  /// The propFields are fields uninitialised in a class, and therefore will be passed as parameters into the constructor.
+  /// Code to get the "prop fields" in a class
+  /// The prop fields are fields uninitialised in a class, and therefore will be passed as parameters into the constructor.
+  /// 
+  /// These fields are encapsulated in a [PropField] class, which gives relevant information as to how these fields are presented in the constructor.
+  /// 
+  /// These feilds are usually denoted with an `@prop` or `@Prop()` annotation on them. 
+  /// By default all uninitialised variables, except those bearing an `@noprop` annotation are passed as props. 
+  /// 
+  /// The `@Prop()` annotation helps define the kind of prop field it is (whether it has a default value or not), and this information is stored in the [PropField] class.
   List<PropField> get props {
     List<PropField> initList = List<PropField>.generate(
       varDef.where((element) {
@@ -156,7 +165,7 @@ class PheasantScript {
     return (initList + indirectList);
   }
 
-    /// Getter to get the methods for the desired pheasant app component.
+  /// Getter to get the methods for the desired pheasant app component.
   /// 
   /// This method translates the ast definition [funDef] stored in the class to the `code_builder` type [Method] to use in the `renderFunc` function.
   List<Method> get methods {
@@ -297,36 +306,3 @@ Fix: ${result.errors.map((e) => e.correctionMessage)}
   return newUnit.directives.whereType<ImportDirective>().toList();
 }
 
-class PropField {
-  final Field fieldDef;
-  final AnnotationInfo annotationInfo;
-
-  const PropField({required this.fieldDef, required this.annotationInfo});
-
-  @override
-  String toString() => "Annotation: $annotationInfo \nField: $fieldDef";
-}
-
-class AnnotationInfo {
-  final String name;
-  final Map<String, dynamic> data;
-
-  const AnnotationInfo({required this.name, this.data = const {}});
-
-  @override
-  String toString() => "$name : $data";
-}
-
-class PropInfo {
-  final dynamic defaultTo;
-  final bool optional;
-
-  const PropInfo({this.defaultTo, this.optional = false});
-  factory PropInfo.fromMap({Map map = const {}}) {
-    return PropInfo(defaultTo: map['defaultTo'], optional: map['optional'] as bool? ?? false);
-  }
-}
-
-class PropAnnotationInfo extends AnnotationInfo{
-  const PropAnnotationInfo({super.data = const {}}) : super(name: 'prop');
-}

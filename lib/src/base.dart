@@ -47,17 +47,18 @@ abstract class PheasantTemplate {
 
   PheasantTemplate({required this.template});
 
-  @From('0.1.1')
+  @From('0.1.3')
   void init() {}
 
-  @From('0.1.1')
+  @From('0.1.3')
   void del() {}
   
   /// The `render` function.
   /// 
-  /// This function accepts a single parameter: `temp` which is of type [String] which represents the desired templating string to be rendered.
+  /// This function accepts two parameters: 
+  /// `temp` which is of type [String] which represents the desired templating string to be rendered, and
+  /// `state` which represents the state of the application, as a [TemplateState].
   /// 
   /// The function returns a html element of type [Element].
-  // TODO: Include State description.
-  Element render(String temp, [TemplateState state]);
+  Element render(String temp, [TemplateState? state]);
 }

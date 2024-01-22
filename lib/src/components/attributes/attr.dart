@@ -47,8 +47,13 @@ enum PheasantAttribute implements PheasantAttributeType {
   final PheasantAttributeType? dependsOn;
 }
 
-// TODO: Add description for the following new classes
 
+/// Class for Pheasant Event Handling Attributes
+/// 
+/// This class forms the basis of the enum [PheasantEventHandlingAttribute] by extending an ordinary [PheasantAttributeType] for event handling attributes.
+/// These attributes include `p-on:click`, `p-on:abort` and much more.
+/// 
+/// There is an extra variable which references the [PheasantAttribute] it is based on, which goes by the name [basedOn].
 abstract interface class PheasantEventHandlingAttributeType extends PheasantAttributeType {
   final PheasantAttributeType basedOn;
 
@@ -82,7 +87,7 @@ enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeTyp
   p_on_custom(name: 'p-on:custom', basedOn: PheasantAttribute.p_on),
   ;
 
-  const PheasantEventHandlingAttribute({required this.name, required this.basedOn, this.dependsOn});
+  const PheasantEventHandlingAttribute({required this.name, required this.basedOn}) : dependsOn = null;
 
   @override
   final String name;

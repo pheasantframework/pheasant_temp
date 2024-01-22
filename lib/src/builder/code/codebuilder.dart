@@ -15,6 +15,8 @@ import '../code/funbuilder.dart';
 /// 
 /// The key functionality that this function generates is the [render] function, which is generated via the [renderRenderFunc], in order to return the desired html component to be rendered in the DOM.
 /// 
+/// This HTML component can be rerendered through state changes that may occur in the code.
+/// 
 /// This function returns a string, which is the composition for the generated dart file with the extension [buildExtension] which defaults to `'.phs.dart'`.
 /// 
 /// The [appDirPath] field is for use by the [scopeComponents] function alongside the [PheasantStyle] object in the event that css/scss/sass files are being imported.
@@ -30,8 +32,6 @@ import '../code/funbuilder.dart';
 /// 
 /// 5. Generates the definition for, and overrides, the `render` function in the parent class, to return an element of type `Element`
 /// 
-// TODO: Implement state and add state description to document
-// TODO: Implement slot adding
 String renderFunc({
   required String script, 
   required String template, 
@@ -129,7 +129,6 @@ String renderFunc({
         ),
       ])
       ..optionalParameters.addAll([
-        // TODO: Do not forget about this thing sha
         Parameter((p) => p
         ..name = 'state'
         ..type = refer('TemplateState?', 'package:pheasant/build.dart')
