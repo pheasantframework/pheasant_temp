@@ -249,6 +249,12 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
     $stateStatement
     ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
   });''';
+  if ((pheasantHtml.attributes.keys.contains('nostate'))) {
+    statement = '''$elementName.$eventStatement.listen((event) {
+      ${preventDefault ? 'event.preventDefault();' : ""}
+      ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
+    });''';
+  }
   return TempPheasantRenderClass(number: closebracket, value: statement);
 }
 
@@ -313,7 +319,7 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
       beginningFunc += '$elementName.classes.add("${attr.value}");';
     } else if (attr.key == 'href' || attr.key == 'id') {
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
-    } else if ((attr.key as String).toLowerCase().contains('preventdefault') || (attr.key as String).contains('@')) {
+    } else if ((attr.key as String).toLowerCase().contains('preventdefault') || (attr.key as String).contains('@') || (attr.key as String).contains('nostate')) {
 
     } else if (
       !PheasantAttribute.values.map((e) => e.name).contains(attr.key) 
