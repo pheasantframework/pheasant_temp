@@ -233,8 +233,18 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
     }
     return e;
   }).join();
+  bool preventDefault = false;
+  if ((pheasantHtml.attributes.keys).contains('preventdefault')) {
+    preventDefault = true;
+  } else if (
+    (pheasantHtml.attributes.keys).contains('preventdefaults') 
+    && (pheasantHtml.attributes.entries.firstWhere((element) => element.key == 'preventdefaults').value.split(' ').contains(defAttr.name))
+  ) {
+    preventDefault = true;
+  }
   statement = '''$elementName.$eventStatement.listen((event) {
     ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
+    ${preventDefault ? 'event.preventDefault();' : ""}
     ${!defaultStateAttributes.keys.contains(value) ? "$value;" : ""}
     $stateStatement
     ${!defaultStateAttributes.keys.contains(value) ? "}" : ""}
@@ -303,6 +313,8 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
       beginningFunc += '$elementName.classes.add("${attr.value}");';
     } else if (attr.key == 'href' || attr.key == 'id') {
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
+    } else if ((attr.key as String).toLowerCase().contains('preventdefault') || (attr.key as String).contains('@')) {
+
     } else if (
       !PheasantAttribute.values.map((e) => e.name).contains(attr.key) 
       && !PheasantEventHandlingAttribute.values.map((e) => e.name).contains(attr.key)
@@ -314,6 +326,21 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
         beginningFunc += '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
     }
+    if (pheasantHtml.localName == 'input' && (attr.key as String).contains('@')) {
+      String data = '''$elementName.onInput.listen((event) {''';
+      if ((pheasantHtml.attributes.keys).contains('preventDefault')) {
+        data += '''event.preventDefault();''';
+      } else if (
+        (pheasantHtml.attributes.keys).contains('preventDefaults') 
+        && (pheasantHtml.attributes.entries.firstWhere((element) => element.key == 'preventDefaults').value.split(' ').contains('onInput'))
+      ) {
+        data += '''event.preventDefault();''';
+      }
+      data += ''' ${(attr.key as String).replaceFirst('@', '')} = ($elementName as _i2.InputElement).value ?? '';
+      });''';
+      beginningFunc += data;
+    }
+    
   }
   if (styleScoped != null && styleScoped.scoped) {
     beginningFunc += '$elementName.classes.add("${styleScoped.id}");';
