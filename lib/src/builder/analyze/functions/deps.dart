@@ -1,5 +1,5 @@
-import 'package:analyzer/dart/ast/ast.dart';
-import 'package:code_builder/code_builder.dart';
+import 'package:analyzer/dart/ast/ast.dart' show FunctionDeclaration, VariableDeclaration;
+import 'package:code_builder/code_builder.dart' show Code, FieldModifier;
 
 
 FieldModifier modifier(VariableDeclaration vd) {

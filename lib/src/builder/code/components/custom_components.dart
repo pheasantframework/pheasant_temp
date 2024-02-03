@@ -1,6 +1,6 @@
-import 'package:html/dom.dart';
-import 'package:pheasant_temp/src/exceptions/exceptions.dart';
-import '../src/cc.dart';
+import 'package:html/dom.dart' show Element;
+import '../../../exceptions/exceptions.dart';
+import '../src/cc.dart' show serveSingleComponents;
 
 /// Function to help in rendering custom components
 /// 

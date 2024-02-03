@@ -1,13 +1,13 @@
-import 'package:code_builder/code_builder.dart';
-import 'package:html/parser.dart';
+import 'package:code_builder/code_builder.dart' show Code;
+import 'package:html/parser.dart' show HtmlParser;
 import 'package:markdown/markdown.dart' show markdownToHtml;
-import 'package:pheasant_assets/pheasant_assets.dart';
-import 'package:pheasant_temp/src/exceptions/exceptions.dart';
+import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, scopeComponents;
 
+import '../../exceptions/exceptions.dart';
 import 'components/custom_components.dart';
-import '../analyze/analyze.dart';
-import 'src/deps.dart';
-import '../../components/attributes/attr.dart';
+import '../analyze/analyze.dart' show PheasantScript;
+import 'src/deps.dart' show renderElement, styleElement;
+import '../../components/attributes/attr.dart' show PheasantAttribute;
 
 /// Function used to render the `render` function defined in the base class `RavenTemplate`.
 /// 
@@ -68,6 +68,13 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
       throw PheasantTemplateException('Error while parsing markdown: $e \nStack Trace: $s');
     }
     beginningFunc += "_i2.Element element = _i2.Element.div()..innerHtml = '''$switchedHtml''';";
+    Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
+    beginningFunc = renderElement(
+      beginningFunc, 
+      pheasantHtml, 
+      attrmap, 
+      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath)
+    );
     beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
   } else {
 
