@@ -3,7 +3,7 @@
 /// Base class for a Pheasant Attribute/Directive in a '.phs' template file
 /// 
 /// The class encapsulates the base info of all attributes: 
-abstract interface class PheasantAttributeType {
+abstract class PheasantAttributeType {
   final String name;
   final PheasantAttributeType? dependsOn;
 
@@ -54,14 +54,11 @@ enum PheasantAttribute implements PheasantAttributeType {
 /// These attributes include `p-on:click`, `p-on:abort` and much more.
 /// 
 /// There is an extra variable which references the [PheasantAttribute] it is based on, which goes by the name [basedOn].
-abstract interface class PheasantEventHandlingAttributeType extends PheasantAttributeType {
+abstract class PheasantEventHandlingAttributeType extends PheasantAttributeType {
   final PheasantAttributeType basedOn;
 
   const PheasantEventHandlingAttributeType({required super.name, required this.basedOn, super.dependsOn});
 }
-
-// TODO: Estabish means of adding and creating new attributes:
-/// 1. Make a list, and add the enum values in it, then allow for custom attributes to be added to the list.
 
 /// Enhanced Enum Class based on the [PheasantEventHandlingAttributeType] class.
 /// 
