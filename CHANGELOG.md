@@ -1,3 +1,6 @@
+## 0.1.0-beta.2
+- Fixed dependency graph to work with `pheasant_meta ^0.1.0-beta.1`.
+
 ## 0.1.0-beta.1
 - Added input binding
 - Added prevent default support
