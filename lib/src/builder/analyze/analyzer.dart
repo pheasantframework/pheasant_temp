@@ -212,6 +212,20 @@ class PheasantScript {
     });
   }
 
+  List<Method> get jsMethods => methods.where((element) {
+    return element.annotations.where((p0) {
+      return p0.code.toString().contains('JS');
+    }).isNotEmpty;
+  }).toList();
+
+  // List<Method> get internaljsMethods;
+
+  List<Method> get nonjsMethods => methods.where((element) {
+    return !element.annotations.where((p0) {
+      return p0.code.toString().contains('JS');
+    }).isNotEmpty;
+  }).toList();
+
   /// Getter to get the imports for the desired pheasant app component.
   /// 
   /// This method translates the ast definition [impDef] stored in the class to the `code_builder` type [Directive] to use in the `renderFunc` function.

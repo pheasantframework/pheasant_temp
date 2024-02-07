@@ -2,6 +2,7 @@ import 'package:html/dom.dart' show Element, Text;
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, PheasantStyleScoped;
 
+import '../constants/defs.dart';
 import 'events.dart';
 import '../constants/lists.dart' as phsattr;
 import '../constants/tempclass.dart';
@@ -182,8 +183,6 @@ String markdownRender(String beginningFunc, String childname, Element element, P
   return beginningFunc;
 }
 
-typedef PheasantTC = TempPheasantRenderClass;
-
 /// Function used for writing code to make and assert pheasant custom attributes in a component (bringing your Dart to your HTML)
 /// 
 /// This function asseses the [Element] named [pheasantHtml] and then iterates through the attributes in the element. 
@@ -299,11 +298,6 @@ PheasantTC pheasantBasicAttributes(
       }
       break;
     default:
-      if (defAttr is PheasantAttribute) {
-
-      } else {
-
-      }
   }
   return TempPheasantRenderClass(number: closebracket, value: statement);
 }
@@ -323,14 +317,16 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elem
     } else if (phsattr.nonrenderableAttrs((attr.key as String).toLowerCase())) {
 
     } else if (
-      phsattr.pheasantAttr.contains(attr.key)
+      !phsattr.pheasantAttr.contains(attr.key)
       && !phsattr.containsDepAttrs(attr.key as String)
     ) {
       if (!(attr.key as String).contains('p-attach')) {
-        beginningFunc += '$elementName.setAttribute("${attr.key as String}", ${attr.value});';
+        beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
       } else {
         beginningFunc += '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
+    } else {
+      beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     }
     if (pheasantHtml.localName == 'input' && (attr.key as String).contains('@')) {
       String data = '''$elementName.onInput.listen((event) {''';

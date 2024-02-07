@@ -64,6 +64,12 @@ String renderFunc({
       ).dartedNonDartImports(newExtension: buildExtension)
   ); // Non-dart imports - importing dartified (dart-generated) files
 
+  item.body.addAll(
+    PheasantScript(
+      funDef: extractFunction(script)
+    ).jsMethods
+  );
+
   // Create class for template
   item.body.add(
     Class((c) => c
@@ -74,7 +80,7 @@ String renderFunc({
       PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script)
-      ).methods
+      ).nonjsMethods // Add Non-JavaScript Methods
     )
     // Add fields generated from `script` file
     ..fields.addAll(
@@ -112,7 +118,7 @@ String renderFunc({
           ..toThis = true
           ..name = e.fieldDef.name
           ..required = !(e.annotationInfo.data['optional'] as bool)
-          ..defaultTo = e.annotationInfo.data['defaultTo'] == '' ? null : Code("${e.annotationInfo.data['defaultTo']}")
+          ..defaultTo = e.annotationInfo.data['defaultTo'] == '' || e.annotationInfo.data['defaultTo'] == null ? null : Code("${e.annotationInfo.data['defaultTo']}")
           );
         })
       )

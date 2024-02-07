@@ -5,6 +5,8 @@ import 'package:pheasant_meta/pheasant_meta.dart' show From, PheasantUnimplement
 
 import '../base.dart';
 
+// TODO: Figuree out how to control state in child components
+
 /// Mixin for base definition of state control functions.
 /// 
 /// The functions defined in this mixin represent the base functions required to represent state management and state control.
