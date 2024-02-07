@@ -1,6 +1,6 @@
 import 'package:html/dom.dart' show Element;
 import '../../../exceptions/exceptions.dart';
-import '../src/cc.dart' show serveSingleComponents;
+import 'cc.dart' show serveSingleComponents;
 
 /// Function to help in rendering custom components
 /// 

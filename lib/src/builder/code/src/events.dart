@@ -1,3 +1,4 @@
+import 'package:html/dom.dart' show Element;
 import 'package:pheasant_meta/pheasant_meta.dart' show From;
 import '../../../components/attributes/attr.dart' show PheasantEventHandlingAttribute;
 
@@ -17,3 +18,15 @@ Map<String, String> get defaultStateAttributes => {
   'reloadState' : 'state?.reload();',
   'unfreezeState' : 'state?.unfreeze();'
 };
+
+bool preventDefaultCheck(Element pheasantHtml, String name) {
+  if ((pheasantHtml.attributes.keys).contains('preventdefault')) {
+    return true;
+  } else if (
+    (pheasantHtml.attributes.keys).contains('preventdefaults') 
+    && (pheasantHtml.attributes.entries.firstWhere((element) => element.key == 'preventdefaults').value.split(' ').contains(name))
+  ) {
+    return true;
+  }
+  return false;
+}
