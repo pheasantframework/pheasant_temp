@@ -1,5 +1,5 @@
 import 'package:code_builder/code_builder.dart' 
-  show Class, Code, CodeExpression, Constructor, DartEmitter, Field, LibraryBuilder, Method, Parameter, refer;
+  show Class, Code, CodeExpression, Constructor, DartEmitter, Field, LibraryBuilder, Method, Parameter, refer, Directive;
 import 'package:dart_style/dart_style.dart' show DartFormatter;
 import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, scopeComponents;
 
@@ -62,7 +62,12 @@ String renderFunc({
         funDef: extractFunction(script),
         impDef: extractImports(script)
       ).dartedNonDartImports(newExtension: buildExtension)
-  ); // Non-dart imports - importing dartified (dart-generated) files
+  );
+  if (PheasantScript(funDef: extractFunction(script)).jsMethods.isNotEmpty) {
+    item.directives.add(
+    Directive.import('dart:js_interop', as: '_i0')
+  );// Non-dart imports - importing dartified (dart-generated) files
+  }
 
   item.body.addAll(
     PheasantScript(

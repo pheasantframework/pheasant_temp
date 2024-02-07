@@ -2,7 +2,7 @@ import 'package:analyzer/dart/analysis/utilities.dart' show parseString;
 import 'package:analyzer/dart/ast/ast.dart' hide Directive;
 
 import 'package:code_builder/code_builder.dart' 
-  show Code, CodeExpression, Directive, DirectiveBuilder, Field, FieldBuilder, Method, MethodType, Parameter, refer;
+  show Code, CodeExpression, Directive, DirectiveBuilder, Field, FieldBuilder, Method, MethodType, Parameter, refer, Reference;
 
 import 'metadata/props.dart';
 
@@ -203,7 +203,11 @@ class PheasantScript {
       )
       ..annotations.addAll(List.generate(
         function.metadata.length, 
-        (index) => CodeExpression(Code('${function.metadata[index]}'))
+        (index) {
+          return CodeExpression(!function.metadata[index].toString().contains('JS') 
+            ? Code(function.metadata[index].toString().replaceAll('@', ''))
+            : Code(function.metadata[index].toString().replaceAll('@', '_i0.')));
+        }
         ))
       ..external = function.externalKeyword == null ? false : true
       ..type = function.isGetter ? MethodType.getter : (function.isSetter ? MethodType.setter : null)
