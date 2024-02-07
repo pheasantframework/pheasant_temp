@@ -2,7 +2,6 @@
 
 ![Pub Version](https://img.shields.io/pub/v/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)  ![Pub Publisher](https://img.shields.io/pub/publisher/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)
 
-
 Welcome to the Pheasant Templating engine package. 
 
 This package is used to render content from .phs files into dart template files to be used during build time.
@@ -11,6 +10,8 @@ This resource is not intended for use by the end user or for general use, but ma
 It can be used for low-level handling of pheasant file data.
 
 ### Some things to note
+
+NOTE: There was a minor mismatch, and changes that were made in the `pheasant_meta` package to complement `pheasant_temp` for version `0.1.0-beta.1` were not reflected in the dependency graph. Therefore, you can either make the fix by overriding pheasant_meta manually to `0.1.0-beta.1`, or by not using version `0.1.0-beta.1` of this package and use `0.1.0-beta.2` instead.
 
 This package is constantly under development, and may not be perfect. If you have any issues with this package, or any packages that depend on it because of this package, please feel free to raise an issue, and we will work on it. Ensure to [follow the guidelines](./CODE_OF_CONDUCT.md), though. 
 
