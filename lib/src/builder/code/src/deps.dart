@@ -309,7 +309,7 @@ PheasantTC pheasantBasicAttributes(
 /// This function asseses the [Element] named [pheasantHtml] and then iterates through the attributes in the element. 
 /// It then adds the appropriate line of code to render it.
 /// 
-/// It also specially renderes certain attributes like `p-attach` for instance.
+/// It also specially renderes certain attributes like `p-attach`, `p-bind`, `preventDefault(s)` and more.
 String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (phsattr.className.contains(attr.key)) {
