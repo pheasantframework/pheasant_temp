@@ -22,6 +22,8 @@ import '../code/funbuilder.dart';
 /// 
 /// The [appDirPath] field is for use by the [scopeComponents] function alongside the [PheasantStyle] object in the event that css/scss/sass files are being imported.
 /// 
+/// The function also gives way for configuration options such as [js] and [sass] to denote whether javascript and sass have been enabled on the project respectively.
+/// 
 /// The function does the following, in the given order:
 /// 1. Adds the required directives needed for the code: It starts off with the directives needed for every instance of a component, then adds imports included in the pheasant file.
 /// 
@@ -40,6 +42,8 @@ String renderFunc({
   String buildExtension = '.phs.dart', 
   final String? appDirPath,
   PheasantStyle pheasantStyle = const PheasantStyle(),
+  bool sass = false,
+  bool js = false
 }) {
   // Get emitter and formatter 
   final formatter = DartFormatter(); 
@@ -69,11 +73,13 @@ String renderFunc({
   );// Non-dart imports - importing dartified (dart-generated) files
   }
 
-  item.body.addAll(
-    PheasantScript(
-      funDef: extractFunction(script)
-    ).jsMethods
-  );
+  if (js) {
+    item.body.addAll(
+      PheasantScript(
+        funDef: extractFunction(script)
+      ).jsMethods
+    );
+  }
 
   // Create class for template
   item.body.add(
@@ -156,7 +162,8 @@ String renderFunc({
           impDef: extractImports(script)
         ),
         pheasantStyle: pheasantStyle,
-        appDirPath: appDirPath ?? 'lib'
+        appDirPath: appDirPath ?? 'lib',
+        sass: sass
         )
       )
     )
