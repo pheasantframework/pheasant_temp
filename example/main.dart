@@ -1,4 +1,3 @@
-import 'package:code_builder/code_builder.dart';
 import 'package:pheasant_temp/pheasant_temp.dart';
 
 void main() {
@@ -18,6 +17,10 @@ void addNum() {
 void subtractNum() {
   number -= 1;
 }
+
+@JS('console.log')
+external void log(String data);
+
 """, template: """
 <div class="foo" p-for="var value in nums">
   Welcome to Pheasant
@@ -44,21 +47,5 @@ void subtractNum() {
   print(
     renderMain()
   );
-//   String script = """
-// import './Component.phs' as Component;
-// import '../fruit/fruit.phs' as fruit;
-
-// var number = 9;
-
-// List<int> nums = [1, 2, 3, 4];
-
-// @JS('console.log')
-// external void log(String word);
-
-// @JS('subtract')
-// void subtractNum() {
-//   number -= 1;
-// }
-// """;
 }
 
