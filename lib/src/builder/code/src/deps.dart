@@ -123,8 +123,10 @@ String attachChildren(
         if (element.localName == 'md') {
           // Markdown components can be easily rendered with just two lines, thanks to the markdown package.
           // Do take note that the data must be flat down (no scope indentation) - for now
-          beginningFunc = markdownRender(beginningFunc, childname, element, pheasantStyleScoped, attrmap);
+          beginningFunc += markdownRender(beginningFunc, childname, element, pheasantStyleScoped, attrmap);
           beginningFunc += '$elementName.children.add($childname);';
+        } else if (element.localName == 'action') {
+          beginningFunc += element.innerHtml;
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
             var componentItem = '${element.localName}.${'${element.localName!}Component()'}';
