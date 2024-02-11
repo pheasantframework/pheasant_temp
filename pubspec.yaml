@@ -16,6 +16,7 @@ dependencies:
   markdown: ^7.1.1
   pheasant_meta: ^0.1.0-beta.1
   pheasant_assets: ^0.1.0-beta
+  pheasant_assets: ^0.1.0-alpha
 
 dev_dependencies:
   lints: ^2.1.0
