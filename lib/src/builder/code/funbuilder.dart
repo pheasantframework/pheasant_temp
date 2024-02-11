@@ -88,14 +88,15 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
     formatCustomComponents(importMap, template, pheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
-    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
+    var scopedStyle = scopeComponents(pheasantStyle, appPath: appDirPath, sassEnabled: sass);
+    beginningFunc = styleElement(beginningFunc, scopedStyle, 'element');
 
     beginningFunc = renderElement(
       beginningFunc, 
       pheasantHtml, 
       attrmap, 
       nonDartImports: importMap, 
-      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath, sassEnabled: sass)
+      pheasantStyleScoped: scopedStyle
     );
   }
   // Final Line
