@@ -15,7 +15,8 @@ FieldModifier modifier(VariableDeclaration vd) {
 }
 
 
-Code funBody(FunctionDeclaration fd) {
+Code? funBody(FunctionDeclaration fd) {
   String body = fd.functionExpression.body.toSource();
-  return Code(body.replaceRange(body.length - 1, null, '').replaceFirst('{', ''));
+  body = body.replaceRange(body.length - 1, null, '').replaceFirst('{', '');
+  return body.isEmpty ? null : Code(body);
 }

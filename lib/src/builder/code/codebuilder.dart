@@ -1,5 +1,5 @@
 import 'package:code_builder/code_builder.dart' 
-  show Class, Code, CodeExpression, Constructor, DartEmitter, Field, LibraryBuilder, Method, Parameter, refer;
+  show Class, Code, CodeExpression, Constructor, DartEmitter, Field, LibraryBuilder, Method, Parameter, refer, Directive;
 import 'package:dart_style/dart_style.dart' show DartFormatter;
 import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, scopeComponents;
 
@@ -22,6 +22,8 @@ import '../code/funbuilder.dart';
 /// 
 /// The [appDirPath] field is for use by the [scopeComponents] function alongside the [PheasantStyle] object in the event that css/scss/sass files are being imported.
 /// 
+/// The function also gives way for configuration options such as [js] and [sass] to denote whether javascript and sass have been enabled on the project respectively.
+/// 
 /// The function does the following, in the given order:
 /// 1. Adds the required directives needed for the code: It starts off with the directives needed for every instance of a component, then adds imports included in the pheasant file.
 /// 
@@ -40,6 +42,8 @@ String renderFunc({
   String buildExtension = '.phs.dart', 
   final String? appDirPath,
   PheasantStyle pheasantStyle = const PheasantStyle(),
+  bool sass = false,
+  bool js = false
 }) {
   // Get emitter and formatter 
   final formatter = DartFormatter(); 
@@ -62,7 +66,20 @@ String renderFunc({
         funDef: extractFunction(script),
         impDef: extractImports(script)
       ).dartedNonDartImports(newExtension: buildExtension)
-  ); // Non-dart imports - importing dartified (dart-generated) files
+  );
+  if (PheasantScript(funDef: extractFunction(script)).jsMethods.isNotEmpty) {
+    item.directives.add(
+    Directive.import('dart:js_interop', as: '_i0')
+  );// Non-dart imports - importing dartified (dart-generated) files
+  }
+
+  if (js) {
+    item.body.addAll(
+      PheasantScript(
+        funDef: extractFunction(script)
+      ).jsMethods
+    );
+  }
 
   // Create class for template
   item.body.add(
@@ -74,7 +91,7 @@ String renderFunc({
       PheasantScript(
         varDef: extractVariable(script), 
         funDef: extractFunction(script)
-      ).methods
+      ).nonjsMethods // Add Non-JavaScript Methods
     )
     // Add fields generated from `script` file
     ..fields.addAll(
@@ -112,7 +129,7 @@ String renderFunc({
           ..toThis = true
           ..name = e.fieldDef.name
           ..required = !(e.annotationInfo.data['optional'] as bool)
-          ..defaultTo = e.annotationInfo.data['defaultTo'] == '' ? null : Code("${e.annotationInfo.data['defaultTo']}")
+          ..defaultTo = e.annotationInfo.data['defaultTo'] == '' || e.annotationInfo.data['defaultTo'] == null ? null : Code("${e.annotationInfo.data['defaultTo']}")
           );
         })
       )
@@ -145,7 +162,8 @@ String renderFunc({
           impDef: extractImports(script)
         ),
         pheasantStyle: pheasantStyle,
-        appDirPath: appDirPath ?? 'lib'
+        appDirPath: appDirPath ?? 'lib',
+        sass: sass
         )
       )
     )

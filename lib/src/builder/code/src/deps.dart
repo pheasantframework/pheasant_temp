@@ -2,9 +2,11 @@ import 'package:html/dom.dart' show Element, Text;
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart' show PheasantStyle, PheasantStyleScoped;
 
-import 'events.dart' show defaultStateAttributes;
-import '../../code/src/tempclass.dart';
-import '../../../components/attributes/attr.dart' show PheasantAttribute, PheasantEventHandlingAttribute;
+import '../constants/defs.dart';
+import 'events.dart';
+import '../constants/lists.dart' as phsattr;
+import '../constants/tempclass.dart';
+import '../../../components/attributes/attr.dart';
 
 /// This is the much rather recursive function used in rendering the element variable.
 /// 
@@ -121,8 +123,10 @@ String attachChildren(
         if (element.localName == 'md') {
           // Markdown components can be easily rendered with just two lines, thanks to the markdown package.
           // Do take note that the data must be flat down (no scope indentation) - for now
-          beginningFunc = markdownRender(beginningFunc, childname, element, pheasantStyleScoped, attrmap);
+          beginningFunc += markdownRender(beginningFunc, childname, element, pheasantStyleScoped, attrmap);
           beginningFunc += '$elementName.children.add($childname);';
+        } else if (element.localName == 'action') {
+          beginningFunc += element.innerHtml;
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
             var componentItem = '${element.localName}.${'${element.localName!}Component()'}';
@@ -190,7 +194,7 @@ String markdownRender(String beginningFunc, String childname, Element element, P
 /// The code returns a [TempPheasantRenderClass], which is a temporary class containing the new beginningFunc String `value` and the new closebracket integer `number`.
 /// 
 /// `closebracket` here represents the number of close braces to add for scoped code (due to cases such as `if`, `for` and `while` loops).
-TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, String beginningFunc, int closebracket, {String elementName = 'element', Iterable<String>? attrmap, Iterable<String>? eventAttrMap}) {
+PheasantTC pheasantAttributes(Element? pheasantHtml, String beginningFunc, int closebracket, {String elementName = 'element', Iterable<String>? attrmap, Iterable<String>? eventAttrMap}) {
   Iterable<String> attributeMap = attrmap ?? PheasantAttribute.values.map((e) => e.name);
   Iterable<String> eventAttributeMap = eventAttrMap ?? PheasantEventHandlingAttribute.values.map((e) => e.name);
   for (var attr in pheasantHtml!.attributes.entries) {
@@ -198,7 +202,7 @@ TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, String beginni
       PheasantAttribute defAttr = PheasantAttribute.values[attributeMap.toList().indexOf(attr.key as String)];
       String value = attr.value;
       String statement = '';
-      TempPheasantRenderClass compound = pheasantBasicAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
+      PheasantTC compound = pheasantBasicAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
       closebracket = compound.number;
       statement = compound.value;
       beginningFunc += '$statement\n';
@@ -207,19 +211,19 @@ TempPheasantRenderClass pheasantAttributes(Element? pheasantHtml, String beginni
       PheasantEventHandlingAttribute defAttr = PheasantEventHandlingAttribute.values[eventAttributeMap.toList().indexOf(attr.key as String)];
       String value = attr.value;
       String statement = '';
-      TempPheasantRenderClass compound = pheasantEventHandlingAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
+      PheasantTC compound = pheasantEventHandlingAttributes(pheasantHtml, defAttr, statement, value, closebracket, elementName: elementName);
       closebracket = compound.number;
       statement = compound.value;
       beginningFunc += '$statement\n';
     }
   }
-  return /*beginningFunc*/ TempPheasantRenderClass(number: closebracket, value: beginningFunc);
+  return TempPheasantRenderClass(number: closebracket, value: beginningFunc);
 }
 
 /// Function for handling pheasant atttributes dealing with event handling.
-TempPheasantRenderClass pheasantEventHandlingAttributes(
+PheasantTC pheasantEventHandlingAttributes(
   Element pheasantHtml, 
-  PheasantEventHandlingAttribute defAttr, 
+  PheasantEventHandlingAttributeType defAttr, 
   String statement, 
   String value, 
   int closebracket, {
@@ -234,14 +238,7 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
     return e;
   }).join();
   bool preventDefault = false;
-  if ((pheasantHtml.attributes.keys).contains('preventdefault')) {
-    preventDefault = true;
-  } else if (
-    (pheasantHtml.attributes.keys).contains('preventdefaults') 
-    && (pheasantHtml.attributes.entries.firstWhere((element) => element.key == 'preventdefaults').value.split(' ').contains(defAttr.name))
-  ) {
-    preventDefault = true;
-  }
+  preventDefault = preventDefaultCheck(pheasantHtml, defAttr.name);
   statement = '''$elementName.$eventStatement.listen((event) {
     ${!defaultStateAttributes.keys.contains(value) ? "if (!(state?.onPause ?? false)) { " : "" }
     ${preventDefault ? 'event.preventDefault();' : ""}
@@ -259,9 +256,9 @@ TempPheasantRenderClass pheasantEventHandlingAttributes(
 }
 
 /// Function for switching and handling basic pheasant attributes.
-TempPheasantRenderClass pheasantBasicAttributes(
+PheasantTC pheasantBasicAttributes(
   Element pheasantHtml, 
-  PheasantAttribute defAttr, 
+  PheasantAttributeType defAttr, 
   String statement, 
   String value, 
   int closebracket, {
@@ -312,36 +309,32 @@ TempPheasantRenderClass pheasantBasicAttributes(
 /// This function asseses the [Element] named [pheasantHtml] and then iterates through the attributes in the element. 
 /// It then adds the appropriate line of code to render it.
 /// 
-/// It also specially renderes certain attributes like `p-attach` for instance.
+/// It also specially renderes certain attributes like `p-attach`, `p-bind`, `preventDefault(s)` and more.
 String basicAttributes(Element? pheasantHtml, String beginningFunc, {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
   for (var attr in pheasantHtml!.attributes.entries) {
-    if (attr.key == 'class' || attr.key == 'className') {
+    if (phsattr.className.contains(attr.key)) {
       beginningFunc += '$elementName.classes.add("${attr.value}");';
-    } else if (attr.key == 'href' || attr.key == 'id') {
+    } else if (phsattr.nonStringAttr.contains(attr.key)) {
       beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
-    } else if ((attr.key as String).toLowerCase().contains('preventdefault') || (attr.key as String).contains('@') || (attr.key as String).contains('nostate')) {
+    } else if (phsattr.nonrenderableAttrs((attr.key as String).toLowerCase())) {
 
     } else if (
-      !PheasantAttribute.values.map((e) => e.name).contains(attr.key) 
-      && !PheasantEventHandlingAttribute.values.map((e) => e.name).contains(attr.key)
-      && !(attr.key as String).contains('p-bind') && !(attr.key as String).contains('p-slot')
+      !phsattr.pheasantAttr.contains(attr.key)
+      && !phsattr.containsDepAttrs(attr.key as String)
     ) {
       if (!(attr.key as String).contains('p-attach')) {
-        beginningFunc += '$elementName.setAttribute("${attr.key as String}", ${attr.value});';
+        beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
       } else {
         beginningFunc += '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
+    } else {
+      beginningFunc += '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     }
     if (pheasantHtml.localName == 'input' && (attr.key as String).contains('@')) {
       String data = '''$elementName.onInput.listen((event) {''';
-      if ((pheasantHtml.attributes.keys).contains('preventDefault')) {
+      if (preventDefaultCheck(pheasantHtml, 'onInput')) {
         data += '''event.preventDefault();''';
-      } else if (
-        (pheasantHtml.attributes.keys).contains('preventDefaults') 
-        && (pheasantHtml.attributes.entries.firstWhere((element) => element.key == 'preventDefaults').value.split(' ').contains('onInput'))
-      ) {
-        data += '''event.preventDefault();''';
-      }
+      } 
       data += ''' ${(attr.key as String).replaceFirst('@', '')} = ($elementName as _i2.InputElement).value ?? '';
       });''';
       beginningFunc += data;

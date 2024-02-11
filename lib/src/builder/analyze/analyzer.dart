@@ -203,7 +203,11 @@ class PheasantScript {
       )
       ..annotations.addAll(List.generate(
         function.metadata.length, 
-        (index) => CodeExpression(Code('${function.metadata[index]}'))
+        (index) {
+          return CodeExpression(!function.metadata[index].toString().contains('JS') 
+            ? Code(function.metadata[index].toString().replaceAll('@', ''))
+            : Code(function.metadata[index].toString().replaceAll('@', '_i0.')));
+        }
         ))
       ..external = function.externalKeyword == null ? false : true
       ..type = function.isGetter ? MethodType.getter : (function.isSetter ? MethodType.setter : null)
@@ -211,6 +215,20 @@ class PheasantScript {
       );
     });
   }
+
+  List<Method> get jsMethods => methods.where((element) {
+    return element.annotations.where((p0) {
+      return p0.code.toString().contains('JS');
+    }).isNotEmpty;
+  }).toList();
+
+  // List<Method> get internaljsMethods;
+
+  List<Method> get nonjsMethods => methods.where((element) {
+    return !element.annotations.where((p0) {
+      return p0.code.toString().contains('JS');
+    }).isNotEmpty;
+  }).toList();
 
   /// Getter to get the imports for the desired pheasant app component.
   /// 

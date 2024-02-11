@@ -17,6 +17,10 @@ void addNum() {
 void subtractNum() {
   number -= 1;
 }
+
+@JS('console.log')
+external void log(String data);
+
 """, template: """
 <div class="foo" p-for="var value in nums">
   Welcome to Pheasant

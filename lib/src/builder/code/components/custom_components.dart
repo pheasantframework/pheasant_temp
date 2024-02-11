@@ -1,6 +1,6 @@
 import 'package:html/dom.dart' show Element;
 import '../../../exceptions/exceptions.dart';
-import '../src/cc.dart' show serveSingleComponents;
+import 'cc.dart' show serveSingleComponents;
 
 /// Function to help in rendering custom components
 /// 
@@ -41,7 +41,7 @@ void formatCustomComponents(Map<String, String> importMap, String template, Elem
   String componentName = "";
   for (var element in importMap.keys) {
     componentName = element;
-    var regen = RegExp('<(?<component>$componentName)\\s*(?:/|></\\k<component>)?>');
+    var regen = RegExp('<(?<component>$componentName)([^>]*)\\s*(?:/|></\\k<component>)?>');
     try {
     Iterable<Match> regexMatches = regen.allMatches(template);
     regexMatches.map((e) => e[0]).forEach((el) {

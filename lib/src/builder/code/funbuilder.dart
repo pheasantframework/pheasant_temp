@@ -22,7 +22,8 @@ Code renderRenderFunc({
   PheasantScript pheasantScript = const PheasantScript(), 
   required String template, 
   PheasantStyle pheasantStyle = const PheasantStyle(),
-  final String appDirPath = 'lib'
+  final String appDirPath = 'lib',
+  bool sass = false
 }) {
   String beginningFunc = '''
 
@@ -47,7 +48,10 @@ Code renderRenderFunc({
   // Create the desired element
   final pheasant = HtmlParser(template, lowercaseElementName: false);
   final pheasantHtml = pheasant.parse().children.first;
-  if (pheasant.errors.isNotEmpty) {
+  if (pheasant.errors.isNotEmpty && pheasant.errors.map((e) => e.message)
+      .where((element) {
+        return (!element.contains('solidus not allowed on element') && !element.contains('Expected DOCTYPE'));
+      }).isNotEmpty) {
     print('''Issues Parsing Template Data: ${
       pheasant.errors.map((e) => e.message)
       .where((element) {
@@ -84,14 +88,15 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
     formatCustomComponents(importMap, template, pheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
-    beginningFunc = styleElement(beginningFunc, scopeComponents(pheasantStyle, appPath: appDirPath), 'element');
+    var scopedStyle = scopeComponents(pheasantStyle, appPath: appDirPath, sassEnabled: sass);
+    beginningFunc = styleElement(beginningFunc, scopedStyle, 'element');
 
     beginningFunc = renderElement(
       beginningFunc, 
       pheasantHtml, 
       attrmap, 
       nonDartImports: importMap, 
-      pheasantStyleScoped: scopeComponents(pheasantStyle, appPath: appDirPath)
+      pheasantStyleScoped: scopedStyle
     );
   }
   // Final Line
