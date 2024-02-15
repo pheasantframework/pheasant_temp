@@ -1,12 +1,14 @@
-import 'package:pheasant_temp/src/components/attributes/attr_list.dart'
-  as phs;
-
+import 'package:pheasant_temp/src/components/attributes/attr_list.dart' as phs;
 
 Iterable<String> className = ['class', 'className'];
 
 Iterable<String> nonStringAttr = ['href', 'id'];
 
-Iterable<String> pheasantAttr = [...phs.attributes.map((e) => e.name), ...phs.eventAttributes.map((e) => e.name), ..._depAttrs];
+Iterable<String> pheasantAttr = [
+  ...phs.attributes.map((e) => e.name),
+  ...phs.eventAttributes.map((e) => e.name),
+  ..._depAttrs
+];
 
 Iterable<String> _depAttrs = ['p-bind', 'p-slot'];
 
