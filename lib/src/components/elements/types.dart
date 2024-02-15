@@ -1,7 +1,7 @@
 import 'package:pheasant_meta/pheasant_meta.dart' show nohtml5;
 
 /// Enhanced Enum Set for the types of components that can be rendered in the Pheasant File
-/// 
+///
 /// Each component has a distinctive name that can be called
 enum ComponentType {
   text(name: 'text'),
@@ -19,7 +19,7 @@ enum ComponentType {
 
 /// Enhanced enum set for the types of basic element components that can be rendered in the Pheasant File.
 /// These fall under [ComponentType.element].
-/// 
+///
 /// All other component types not included here are 'custom' components and are differentiated in the [CustomComponentType] enum.
 enum ElementComponentType {
   a(name: 'a', selfclosing: false),
@@ -29,7 +29,8 @@ enum ElementComponentType {
   br(name: 'br', selfclosing: true),
   button(name: 'button', selfclosing: false),
   caption(name: 'caption', selfclosing: false),
-  @nohtml5 center(name: 'center', selfclosing: false),
+  @nohtml5
+  center(name: 'center', selfclosing: false),
   code(name: 'code', selfclosing: false),
   col(name: 'col', selfclosing: true),
   colgroup(name: 'colgroup', selfclosing: false),
@@ -73,7 +74,7 @@ enum ElementComponentType {
 
   /// Default Constructor for the [ElementComponentType] enum.
   /// Each type comes with a [name] and a [selfclosing] attribute.
-  /// 
+  ///
   /// The [name] is distinct - gives the name of the component.
   /// The [selfclosing] boolean denotes whether it is self-closing (doesn't come in a pair of tags).
   const ElementComponentType({required this.name, required this.selfclosing});
@@ -93,10 +94,10 @@ enum ElementComponentType {
 
 /// Enhanced enum set for all other components that are either not found in the [ElementComponentType] enum, are not comments ([ComponentType.comment]) and are not text ([ComponentType.text])
 /// They therefore represent the distinct types that fall under [ComponentType.custom].
-/// 
+///
 /// Custom component types are either imported into the file as basic components (from a .phs file), or are web components created on the fly or on the file.
 /// Web Component types have a 'wc-' prefix, and the value of [imported] is set to false.
-/// 
+///
 /// Any other component type not found here is therefore listed as 'undefined' and falls under [ComponentType.unknown].
 enum CustomComponentType {
   single(selfclosing: true, imported: true),
@@ -105,7 +106,8 @@ enum CustomComponentType {
   wcdouble(selfclosing: false, imported: false),
   ;
 
-  const CustomComponentType({required this.selfclosing, required this.imported});
+  const CustomComponentType(
+      {required this.selfclosing, required this.imported});
 
   /// Whether the Component is self-closing or not
   final bool selfclosing;

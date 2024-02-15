@@ -6,11 +6,8 @@ class PheasantTemplateException extends PheasantException {
   int exitCode;
   late PheasantTemplateExceptionLevel? level;
 
-  PheasantTemplateException(
-    super.message, {
-    this.exitCode = 1, 
-    int levelNo = 0
-  }) {
+  PheasantTemplateException(super.message,
+      {this.exitCode = 1, int levelNo = 0}) {
     switch (levelNo) {
       case 0:
         level = null;
@@ -28,8 +25,4 @@ class PheasantTemplateException extends PheasantException {
   }
 }
 
-enum PheasantTemplateExceptionLevel {
-  info, 
-  warning, 
-  severe
-}
+enum PheasantTemplateExceptionLevel { info, warning, severe }
