@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 /// Base class for a Pheasant Attribute/Directive in a '.phs' template file
-/// 
-/// The class encapsulates the base info of all attributes: 
+///
+/// The class encapsulates the base info of all attributes:
 abstract class PheasantAttributeType {
   final String name;
   final PheasantAttributeType? dependsOn;
@@ -11,11 +11,11 @@ abstract class PheasantAttributeType {
 }
 
 /// Enhanced enum class based on the base abstract [PheasantAttributeType]
-/// 
+///
 /// In this enum, the different kind of Attributes that can be used on a [PheasantComponent] are listed out here.
 /// Each attribute type has a [name] variable, and linked attributes also have a [dependsOn] variable, which links to another [PheasantAttributeType].
 /// This shows what a [PheasantAttribute] is linked to.
-/// 
+///
 /// Any other attribute not listed here is therefore placed as [PheasantAttribute.unknown].
 enum PheasantAttribute implements PheasantAttributeType {
   p_await(name: 'p-await'),
@@ -35,8 +35,7 @@ enum PheasantAttribute implements PheasantAttributeType {
   p_state(name: 'p-state'),
   p_text(name: 'p-text'),
   p_while(name: 'p-while'),
-  unknown(name: 'nil')
-  ;
+  unknown(name: 'nil');
 
   const PheasantAttribute({required this.name, this.dependsOn});
 
@@ -47,24 +46,26 @@ enum PheasantAttribute implements PheasantAttributeType {
   final PheasantAttributeType? dependsOn;
 }
 
-
 /// Class for Pheasant Event Handling Attributes
-/// 
+///
 /// This class forms the basis of the enum [PheasantEventHandlingAttribute] by extending an ordinary [PheasantAttributeType] for event handling attributes.
 /// These attributes include `p-on:click`, `p-on:abort` and much more.
-/// 
+///
 /// There is an extra variable which references the [PheasantAttribute] it is based on, which goes by the name [basedOn].
-abstract class PheasantEventHandlingAttributeType extends PheasantAttributeType {
+abstract class PheasantEventHandlingAttributeType
+    extends PheasantAttributeType {
   final PheasantAttributeType basedOn;
 
-  const PheasantEventHandlingAttributeType({required super.name, required this.basedOn, super.dependsOn});
+  const PheasantEventHandlingAttributeType(
+      {required super.name, required this.basedOn, super.dependsOn});
 }
 
 /// Enhanced Enum Class based on the [PheasantEventHandlingAttributeType] class.
-/// 
+///
 /// These values represent attributes used for event changes, and are meant to be an extension of a few of the values/attributes in [PheasantAttribute],
 /// mainly [PheasantAttribute.p_on].
-enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeType {
+enum PheasantEventHandlingAttribute
+    implements PheasantEventHandlingAttributeType {
   p_on_abort(name: 'p-on:abort', basedOn: PheasantAttribute.p_on),
   p_on_click(name: 'p-on:click', basedOn: PheasantAttribute.p_on),
   p_on_change(name: 'p-on:change', basedOn: PheasantAttribute.p_on),
@@ -73,7 +74,8 @@ enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeTyp
   p_on_beforeCut(name: 'p-on:beforeCut', basedOn: PheasantAttribute.p_on),
   p_on_beforePaste(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
   p_on_canPlay(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
-  p_on_canPlayThrough(name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
+  p_on_canPlayThrough(
+      name: 'p-on:beforePaste', basedOn: PheasantAttribute.p_on),
   p_on_keyUp(name: 'p-on:keyUp', basedOn: PheasantAttribute.p_on),
   p_on_keyDown(name: 'p-on:keyDown', basedOn: PheasantAttribute.p_on),
   p_on_mouseUp(name: 'p-on:mouseUp', basedOn: PheasantAttribute.p_on),
@@ -84,7 +86,9 @@ enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeTyp
   p_on_custom(name: 'p-on:custom', basedOn: PheasantAttribute.p_on),
   ;
 
-  const PheasantEventHandlingAttribute({required this.name, required this.basedOn}) : dependsOn = null;
+  const PheasantEventHandlingAttribute(
+      {required this.name, required this.basedOn})
+      : dependsOn = null;
 
   @override
   final String name;
@@ -95,4 +99,3 @@ enum PheasantEventHandlingAttribute implements PheasantEventHandlingAttributeTyp
   @override
   final PheasantAttributeType? dependsOn;
 }
-

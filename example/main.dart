@@ -1,8 +1,7 @@
 import 'package:pheasant_temp/pheasant_temp.dart';
 
 void main() {
-  print(
-    renderFunc(script: """
+  print(renderFunc(script: """
 import './Component.phs' as Component;
 import '../fruit/fruit.phs' as fruit;
 
@@ -42,10 +41,6 @@ external void log(String data);
   </md>
   <Component />
 </div>
-""", buildExtension: '.phs.dart')
-  );
-  print(
-    renderMain()
-  );
+""", buildExtension: '.phs.dart'));
+  print(renderMain());
 }
-
