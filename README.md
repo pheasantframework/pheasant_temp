@@ -1,6 +1,7 @@
 # <center>The Pheasant Framework Template Engine</center>
 
-![Pub Version](https://img.shields.io/pub/v/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)  ![Pub Publisher](https://img.shields.io/pub/publisher/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)
+![Pub Version](https://img.shields.io/pub/v/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp)  ![Pub Publisher](https://img.shields.io/pub/publisher/pheasant_temp?labelColor=rgb(245%2C%20193%2C%2066)&link=https%3A%2F%2Fpub.dev%2Fpackages%2Fpheasant_temp) 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/pheasantframework/pheasant_temp/dart.yml?labelColor=rgb(245%2C%20193%2C%2066))
 
 Welcome to the Pheasant Templating engine package. 
 
