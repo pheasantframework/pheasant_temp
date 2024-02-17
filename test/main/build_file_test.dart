@@ -20,14 +20,11 @@ class TestComponent extends PheasantTemplate {
   @override
   Element render(String temp, [TemplateState? state]) {
     return DivElement()
-    ..children = [
-      ParagraphElement()
-      ..text = "Hello",
-      ParagraphElement()
-      ..text = "Welcome to Pheasant Template Test"
-    ];
+      ..children = [
+        ParagraphElement()..text = "Hello",
+        ParagraphElement()..text = "Welcome to Pheasant Template Test"
+      ];
   }
-  
 }
 
 void main() {
@@ -36,12 +33,15 @@ void main() {
     test('html test', () {
       assert(testComponent.template != null);
 
-      querySelector('#input')?.children.add(testComponent.render(testComponent.template!));
+      querySelector('#input')
+          ?.children
+          .add(testComponent.render(testComponent.template!));
 
       expect(document.body?.children, isNotEmpty);
       expect(querySelector('#input')?.children, isNotEmpty);
 
-      expect(querySelector('#input')?.innerHtml, contains(testComponent.template));
+      expect(
+          querySelector('#input')?.innerHtml, contains(testComponent.template));
     });
   });
 }

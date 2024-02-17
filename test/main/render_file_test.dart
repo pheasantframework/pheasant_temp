@@ -38,7 +38,7 @@ void main() {
   <Component />
 </div>
 ''';
-  String style = '''
+    String style = '''
   .test {
     color: gold;
   }
@@ -48,19 +48,27 @@ void main() {
     test('prerequisite functions', () {
       assert(testStyle.src == null);
 
-      PheasantScript testScript = PheasantScript(varDef: extractVariable(script), funDef: extractFunction(script), impDef: extractImports(script));
+      PheasantScript testScript = PheasantScript(
+          varDef: extractVariable(script),
+          funDef: extractFunction(script),
+          impDef: extractImports(script));
 
       expect(testScript.fields.length, equals(1));
       expect(testScript.imports.length, equals(1));
       expect(testScript.methods, isEmpty);
     });
 
-    String output = renderFunc(script: script, template: template, pheasantStyle: testStyle, sass: false);
+    String output = renderFunc(
+        script: script,
+        template: template,
+        pheasantStyle: testStyle,
+        sass: false);
 
     test('main body', () {
       expect(output, contains("import 'dart:html'"));
       expect(output, contains("import 'package:pheasant/build.dart'"));
-      expect(output, contains("import 'components/Component.phs.dart' as Component;"));
+      expect(output,
+          contains("import 'components/Component.phs.dart' as Component;"));
 
       expect(output, contains('int myInt = 5;'));
       expect(output, contains('AppComponent({super.template});'));
@@ -71,20 +79,53 @@ void main() {
   ])'''));
     });
 
-
     test('render function', () {
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'div\'\)").hasMatch(output));
-      assert(RegExp(variableNameRegExp.pattern + r'\.append\(_i2\.Text\(\"\"\"\n\"\"\"\)\)').hasMatch(output));
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'h1\'\)").allMatches(output).isNotEmpty);
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'h2\'\)").allMatches(output).length >= 2);
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'div\'\)").allMatches(output).length >= 2);
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'a\'\)").allMatches(output).length >= 2);
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r" = _i2\.Element\.tag\(\'div\'\)")
+          .hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'\.append\(_i2\.Text\(\"\"\"\n\"\"\"\)\)')
+          .hasMatch(output));
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r" = _i2\.Element\.tag\(\'h1\'\)")
+          .allMatches(output)
+          .isNotEmpty);
+      assert(RegExp(r'_i2.Element ' +
+                  variableNameRegExp.pattern +
+                  r" = _i2\.Element\.tag\(\'h2\'\)")
+              .allMatches(output)
+              .length >=
+          2);
+      assert(RegExp(r'_i2.Element ' +
+                  variableNameRegExp.pattern +
+                  r" = _i2\.Element\.tag\(\'div\'\)")
+              .allMatches(output)
+              .length >=
+          2);
+      assert(RegExp(r'_i2.Element ' +
+                  variableNameRegExp.pattern +
+                  r" = _i2\.Element\.tag\(\'a\'\)")
+              .allMatches(output)
+              .length >=
+          2);
       expect(output, contains('for (int i = 0; i < 2; ++i) {'));
       assert(RegExp(r'\<code\>markdown\<\/code\>').hasMatch(output));
-      assert(RegExp(r'_i2.StyleElement ' + styleVariableNameRegExp.pattern + r" = _i2\.StyleElement\(\)").hasMatch(output));
+      assert(RegExp(r'_i2.StyleElement ' +
+              styleVariableNameRegExp.pattern +
+              r" = _i2\.StyleElement\(\)")
+          .hasMatch(output));
       assert(RegExp(styleVariableNameRegExp.pattern).hasMatch(output));
-      assert(RegExp(variableNameRegExp.pattern + r'component = Component\.ComponentComponent\(\)').hasMatch(output));
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r' = ' + variableNameRegExp.pattern + r'component').hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'component = Component\.ComponentComponent\(\)')
+          .hasMatch(output));
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r' = ' +
+              variableNameRegExp.pattern +
+              r'component')
+          .hasMatch(output));
     });
   });
 
@@ -136,7 +177,7 @@ bool isKnownFruit(String fruit) {
   </Body>
 </div>
 ''';
-  String style = '''
+    String style = '''
 \$font: 'Lato';
 \$monoFont: 'Roboto Mono';
 \$primary-color: red;
@@ -162,12 +203,16 @@ bool isKnownFruit(String fruit) {
 }
 ''';
 
-    PheasantStyle testStyle = PheasantStyle.sassEnabled(data: style, syntax: 'scss');
+    PheasantStyle testStyle =
+        PheasantStyle.sassEnabled(data: style, syntax: 'scss');
     test('prerequisite functions', () {
       assert(testStyle.src == null);
       assert(testStyle.syntax == 'scss');
 
-      PheasantScript testScript = PheasantScript(varDef: extractVariable(script), funDef: extractFunction(script), impDef: extractImports(script));
+      PheasantScript testScript = PheasantScript(
+          varDef: extractVariable(script),
+          funDef: extractFunction(script),
+          impDef: extractImports(script));
 
       expect(testScript.fields.length, equals(3));
       expect(testScript.imports.length, equals(4));
@@ -176,19 +221,23 @@ bool isKnownFruit(String fruit) {
       expect(testScript.props.length, equals(2));
     });
 
-    String output = renderFunc(script: script, template: template, pheasantStyle: testStyle, sass: true);
+    String output = renderFunc(
+        script: script,
+        template: template,
+        pheasantStyle: testStyle,
+        sass: true);
 
     test('main body', () {
       expect(output, contains("import 'dart:html'"));
       expect(output, contains("import 'package:pheasant/build.dart'"));
-      expect(output, contains("import 'src/folder/Component.phs.dart' as Component;"));
+      expect(output,
+          contains("import 'src/folder/Component.phs.dart' as Component;"));
       expect(output, contains("import 'src/Body.phs.dart' as Body;"));
       expect(output, contains("import 'src/Footer.phs.dart' as Footer;"));
       expect(output, contains("import 'src/Header.phs.dart' as Header;"));
 
       expect(output, contains('@_i1.prop\n  int count;'));
-      expect(output, contains(
-'''  AppComponent({
+      expect(output, contains('''  AppComponent({
     super.template,
     required this.count,
     this.userFruit = "none specified",
@@ -202,14 +251,43 @@ bool isKnownFruit(String fruit) {
     });
 
     test('render function', () {
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'div\'\)").hasMatch(output));
-      assert(RegExp(variableNameRegExp.pattern + r'\.append\(_i2\.Text\(\"\"\"\n\"\"\"\)\)').hasMatch(output));
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'h1\'\)").allMatches(output).isNotEmpty);
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'input\'\)").allMatches(output).isNotEmpty);
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r" = _i2\.Element\.tag\(\'button\'\)").allMatches(output).length >= 4);
-      assert(RegExp(variableNameRegExp.pattern + r'\.on\w+\.listen\(\(event\) \{').allMatches(output).length >= 4);
-      assert(RegExp(variableNameRegExp.pattern + r'\.onClick\.listen\(\(event\) \{').allMatches(output).length >= 4);
-      assert(RegExp(r'_i2.StyleElement ' + styleVariableNameRegExp.pattern + r" = _i2\.StyleElement\(\)").hasMatch(output));
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r" = _i2\.Element\.tag\(\'div\'\)")
+          .hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'\.append\(_i2\.Text\(\"\"\"\n\"\"\"\)\)')
+          .hasMatch(output));
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r" = _i2\.Element\.tag\(\'h1\'\)")
+          .allMatches(output)
+          .isNotEmpty);
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r" = _i2\.Element\.tag\(\'input\'\)")
+          .allMatches(output)
+          .isNotEmpty);
+      assert(RegExp(r'_i2.Element ' +
+                  variableNameRegExp.pattern +
+                  r" = _i2\.Element\.tag\(\'button\'\)")
+              .allMatches(output)
+              .length >=
+          4);
+      assert(
+          RegExp(variableNameRegExp.pattern + r'\.on\w+\.listen\(\(event\) \{')
+                  .allMatches(output)
+                  .length >=
+              4);
+      assert(RegExp(variableNameRegExp.pattern +
+                  r'\.onClick\.listen\(\(event\) \{')
+              .allMatches(output)
+              .length >=
+          4);
+      assert(RegExp(r'_i2.StyleElement ' +
+              styleVariableNameRegExp.pattern +
+              r" = _i2\.StyleElement\(\)")
+          .hasMatch(output));
       assert(RegExp(styleVariableNameRegExp.pattern).hasMatch(output));
       expect(output, contains('if (count % 2 == 0) {'));
       expect(output, contains('event.preventDefault();'));
@@ -223,10 +301,21 @@ bool isKnownFruit(String fruit) {
         state?.emit(event, templateState: this);
       }
 '''));
-      assert(RegExp(variableNameRegExp.pattern + r'component = Component\.ComponentComponent\(\)').hasMatch(output));
-      assert(RegExp(variableNameRegExp.pattern + r'component = Body\.BodyComponent\(\)').hasMatch(output));
-      assert(RegExp(variableNameRegExp.pattern + r'component = Header\.HeaderComponent\(\)').hasMatch(output));
-      assert(RegExp(r'_i2.Element ' + variableNameRegExp.pattern + r' = ' + variableNameRegExp.pattern + r'component').hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'component = Component\.ComponentComponent\(\)')
+          .hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'component = Body\.BodyComponent\(\)')
+          .hasMatch(output));
+      assert(RegExp(variableNameRegExp.pattern +
+              r'component = Header\.HeaderComponent\(\)')
+          .hasMatch(output));
+      assert(RegExp(r'_i2.Element ' +
+              variableNameRegExp.pattern +
+              r' = ' +
+              variableNameRegExp.pattern +
+              r'component')
+          .hasMatch(output));
     });
   });
 }

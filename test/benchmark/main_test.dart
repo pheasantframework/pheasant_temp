@@ -5,7 +5,6 @@ import 'dart:developer';
 import 'package:pheasant_temp/pheasant_temp.dart';
 import 'package:test/test.dart';
 
-
 void main() {
   log('Pheasant Benchmark Tests for: renderMain');
   group('speed test', () {
@@ -22,7 +21,9 @@ void main() {
       log('Result 2: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[2] = renderMain(appName: "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposesComponent");
+      results[2] = renderMain(
+          appName:
+              "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposesComponent");
       log('Result 3: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
@@ -30,7 +31,11 @@ void main() {
       log('Result 4: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[4] = renderMain(appName: "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposesComponent", mainEntry: "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposes.phs");
+      results[4] = renderMain(
+          appName:
+              "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposesComponent",
+          mainEntry:
+              "ThisIsAnExtremelyLongClassNameThatServesNoPracticalPurposeButIsUsedHereForDemonstrationPurposes.phs");
       log('Result 5: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.stop();
     });

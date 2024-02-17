@@ -20,7 +20,8 @@ void main() {
     List<String> results = List<String>.filled(5, '');
     List<PheasantTestObject> inputs = [
       PheasantTestObject("", "", ""),
-      PheasantTestObject("var number = 9;", "<div><p>{{number}}</p><p>Hello</p></div>", ""),
+      PheasantTestObject(
+          "var number = 9;", "<div><p>{{number}}</p><p>Hello</p></div>", ""),
       PheasantTestObject("""
 import 'display.phs' as display;
 
@@ -128,23 +129,41 @@ external void log(String data);
     test('speed run', () {
       final Stopwatch stopwatch = Stopwatch()..start();
 
-      results[0] = renderFunc(script: inputs[0].script, template: inputs[0].template, pheasantStyle: PheasantStyle(data: inputs[0].style));
+      results[0] = renderFunc(
+          script: inputs[0].script,
+          template: inputs[0].template,
+          pheasantStyle: PheasantStyle(data: inputs[0].style));
       log('Result 1: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[1] = renderFunc(script: inputs[1].script, template: inputs[1].template, pheasantStyle: PheasantStyle(data: inputs[1].style));
+      results[1] = renderFunc(
+          script: inputs[1].script,
+          template: inputs[1].template,
+          pheasantStyle: PheasantStyle(data: inputs[1].style));
       log('Result 2: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[2] = renderFunc(script: inputs[2].script, template: inputs[2].template, pheasantStyle: PheasantStyle(data: inputs[2].style));
+      results[2] = renderFunc(
+          script: inputs[2].script,
+          template: inputs[2].template,
+          pheasantStyle: PheasantStyle(data: inputs[2].style));
       log('Result 3: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[3] = renderFunc(script: inputs[3].script, template: inputs[3].template, pheasantStyle: PheasantStyle.sassEnabled(data: inputs[3].style, syntax: 'scss'), sass: true);
+      results[3] = renderFunc(
+          script: inputs[3].script,
+          template: inputs[3].template,
+          pheasantStyle:
+              PheasantStyle.sassEnabled(data: inputs[3].style, syntax: 'scss'),
+          sass: true);
       log('Result 4: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
-      results[4] = renderFunc(script: inputs[4].script, template: inputs[4].template, pheasantStyle: PheasantStyle(data: inputs[4].style, scope: StyleScope.global));
+      results[4] = renderFunc(
+          script: inputs[4].script,
+          template: inputs[4].template,
+          pheasantStyle:
+              PheasantStyle(data: inputs[4].style, scope: StyleScope.global));
       log('Result 5: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.stop();
     });
