@@ -1,5 +1,7 @@
 @Timeout(Duration(seconds: 1))
 
+import 'dart:developer';
+
 import 'package:pheasant_assets/pheasant_assets.dart';
 import 'package:pheasant_temp/pheasant_temp.dart';
 import 'package:test/test.dart';
@@ -13,6 +15,7 @@ class PheasantTestObject {
 }
 
 void main() {
+  log('Pheasant Benchmark Tests for: renderMain');
   group('speed test', () {
     List<String> results = List<String>.filled(5, '');
     List<PheasantTestObject> inputs = [
@@ -109,7 +112,7 @@ external void log(String data);
   We can write single `code` and multiblock code like this
   ```dart
   void main() {
-    print("Hello World");
+    log("Hello World");
   }
   ```
   </md>
@@ -126,23 +129,23 @@ external void log(String data);
       final Stopwatch stopwatch = Stopwatch()..start();
 
       results[0] = renderFunc(script: inputs[0].script, template: inputs[0].template, pheasantStyle: PheasantStyle(data: inputs[0].style));
-      print('Result 1: ${stopwatch.elapsedMilliseconds}ms');
+      log('Result 1: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
       results[1] = renderFunc(script: inputs[1].script, template: inputs[1].template, pheasantStyle: PheasantStyle(data: inputs[1].style));
-      print('Result 2: ${stopwatch.elapsedMilliseconds}ms');
+      log('Result 2: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
       results[2] = renderFunc(script: inputs[2].script, template: inputs[2].template, pheasantStyle: PheasantStyle(data: inputs[2].style));
-      print('Result 3: ${stopwatch.elapsedMilliseconds}ms');
+      log('Result 3: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
       results[3] = renderFunc(script: inputs[3].script, template: inputs[3].template, pheasantStyle: PheasantStyle.sassEnabled(data: inputs[3].style, syntax: 'scss'), sass: true);
-      print('Result 4: ${stopwatch.elapsedMilliseconds}ms');
+      log('Result 4: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.reset();
 
       results[4] = renderFunc(script: inputs[4].script, template: inputs[4].template, pheasantStyle: PheasantStyle(data: inputs[4].style, scope: StyleScope.global));
-      print('Result 5: ${stopwatch.elapsedMilliseconds}ms');
+      log('Result 5: ${stopwatch.elapsedMilliseconds}ms');
       stopwatch.stop();
     });
   });
