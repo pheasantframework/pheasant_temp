@@ -336,8 +336,7 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     } else if (phsattr.nonrenderableAttrs((attr.key as String).toLowerCase())) {
-    } else if (!phsattr.pheasantAttr.contains(attr.key) &&
-        !phsattr.containsDepAttrs(attr.key as String)) {
+    } else if (!phsattr.pheasantAttr.contains(attr.key) && !phsattr.containsDepAttrs(attr.key as String)) {
       if (!(attr.key as String).contains('p-attach')) {
         beginningFunc +=
             '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
@@ -345,7 +344,7 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
         beginningFunc +=
             '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
-    } else {
+    } else if (!phsattr.pheasantAttr.contains(attr.key)) {
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     }
