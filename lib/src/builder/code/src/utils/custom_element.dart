@@ -18,7 +18,21 @@ String customComponentRendering(Element element, String beginningFunc, String ch
   }
   beginningFunc += '''
   final ${childname}component = $componentItem;
-  _i2.Element $childname = ${childname}component.render(${childname}component.template!);
+  final ${childname}componentState = _i1.TemplateState(component: ${childname}component, initState: ${childname}component, watchers: List.empty(growable: true));
+  final ${childname}watcher = _i1.ElementChangeWatcher<_i1.PheasantTemplate>(initValue: ${childname}component, state: ${childname}componentState);
+  _i2.Element $childname = ${childname}component.render(${childname}component.template!, ${childname}componentState);
+  ${childname}watcher.initialiseReference($childname);
+  state?.registerWatcher<_i1.PheasantTemplate>(${childname}componentState, ${childname}component, watcher: ${childname}watcher);
+  ${childname}componentState.stateStream.listen((event) {
+    (state?.watchers.singleWhere((e) => e == ${childname}watcher) as _i1.ElementChangeWatcher).setReference($childname);
+    _i2.Element __${childname}_temp = event.newValue!.render(event.newValue!.template!, ${childname}componentState);
+    $childname.replaceWith(
+      __${childname}_temp
+    );
+    ${childname}componentState.watchers.whereType<_i1.ElementChangeWatcher>().forEach((item) => item.reflectChanges());
+  },);
+  
+  
   ''';
   return beginningFunc;
 }
