@@ -126,7 +126,8 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
           beginningFunc += element.innerHtml;
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
-            beginningFunc = customComponentRendering(element, beginningFunc, childname);
+            beginningFunc =
+                customComponentRendering(element, beginningFunc, childname);
           } else {
             beginningFunc +=
                 "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
@@ -336,7 +337,8 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     } else if (phsattr.nonrenderableAttrs((attr.key as String).toLowerCase())) {
-    } else if (!phsattr.pheasantAttr.contains(attr.key) && !phsattr.containsDepAttrs(attr.key as String)) {
+    } else if (!phsattr.pheasantAttr.contains(attr.key) &&
+        !phsattr.containsDepAttrs(attr.key as String)) {
       if (!(attr.key as String).contains('p-attach')) {
         beginningFunc +=
             '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';

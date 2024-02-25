@@ -366,8 +366,8 @@ class ChangeWatcher<T>
 }
 
 /// Mixin for the new [ElementChangeWatcher] object, an object specifically used for changes between parent and children in [PheasantTemplate] objects.
-/// 
-/// This mixin holds the functionality of storing and releasing the state of the object through the [Element.replaceWith] function. 
+///
+/// This mixin holds the functionality of storing and releasing the state of the object through the [Element.replaceWith] function.
 mixin HtmlElementStateControl {
   /// The current reference to the element rendered by the component being watched by the [ChangeWatcher].
   Element? _reference;
@@ -386,21 +386,22 @@ mixin HtmlElementStateControl {
   }
 
   /// Function called after a state change made by the parent to reproduce the current state of the element.
-  /// 
+  ///
   /// In future versions, the functionality here may be replaced by a [State] object on [Element].
   void reflectChanges() {
     if (_reference != null) _initialRef?.replaceWith(_reference!);
   }
 }
 
-
 /// A special extended class of [ChangeWatcher] used to control the state of not only the [PheasantTemplate] object, but the [Element] rendered by the file.
-/// 
+///
 /// When a state change is caused by the parent, it could refresh the changes on the [PheasantTemplate] file, including the changes made on the [Element] and its children elements rendered by the object.
-/// 
+///
 /// In order to store and reproduce these changes, the [ElementChangeWatcher] object has added functionality by the [HtmlElementStateControl] mixin to be able to control the state of children elements that will undergo these state changes.
-class ElementChangeWatcher<U extends PheasantTemplate> extends ChangeWatcher<U> with HtmlElementStateControl {
-  ElementChangeWatcher({required U initValue, State<U>? state}) : super(initValue: initValue, state: state);
+class ElementChangeWatcher<U extends PheasantTemplate> extends ChangeWatcher<U>
+    with HtmlElementStateControl {
+  ElementChangeWatcher({required U initValue, State<U>? state})
+      : super(initValue: initValue, state: state);
 }
 
 /// The class used in Pheasant Template Components. This class extends the base class [ElementState] with functionality used directly in controlling state in an application.
@@ -413,7 +414,7 @@ class TemplateState extends ElementState<PheasantTemplate> {
   List<ChangeWatcher> watchers = [];
 
   /// Constructor to create a [TemplateState] object.
-  /// 
+  ///
   /// Ensure to pass [watchers] as a growable list - [List.empty] for instance - else watchers would not be able to be registered.
   TemplateState(
       {required super.component,
