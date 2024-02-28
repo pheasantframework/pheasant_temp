@@ -82,6 +82,7 @@ enum PheasantEventHandlingAttribute
   p_on_mouseDown(name: 'p-on:mouseDown', basedOn: PheasantAttribute.p_on),
   p_on_input(name: 'p-on:input', basedOn: PheasantAttribute.p_on),
   p_on(name: 'p-on', basedOn: PheasantAttribute.p_on),
+  p_on_hover(name: 'p-on:hover', basedOn: PheasantAttribute.p_on),
   p_on_ended(name: 'p-on:ended', basedOn: PheasantAttribute.p_on),
   p_on_custom(name: 'p-on:custom', basedOn: PheasantAttribute.p_on),
   ;

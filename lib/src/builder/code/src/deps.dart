@@ -1,7 +1,10 @@
 import 'package:html/dom.dart' show Element, Text;
+import 'package:html/dom.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart'
     show PheasantStyle, PheasantStyleScoped;
+import 'package:pheasant_temp/src/builder/code/src/utils/custom_element.dart';
+import 'package:pheasant_temp/src/builder/code/src/utils/text_node.dart';
 
 import '../constants/defs.dart';
 import 'events.dart';
@@ -107,19 +110,7 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
           pheasantHtml.nodes.last == element) {
       } else if (element.nodeType == 3) {
         // Render text nodes
-        if ((element.text ?? '').contains(RegExp(r'\{\{([^\}]+)\}\}'))) {
-          // Remove interpolation and add desired value
-          final regex = RegExp(r'\{\{([^\}]+)\}\}');
-          Match match = regex.allMatches(element.text ?? '').first;
-          element.text = '\${${match[1]}}';
-        } else if ((element.text ?? '').contains(RegExp(r'\{([^\}]+)\}'))) {
-          // Remove interpolation and add desired value
-          final regex = RegExp(r'\{([^\}]+)\}');
-          Match match = regex.allMatches(element.text ?? '').first;
-          element.text = '\${${match[1]}}';
-        }
-        beginningFunc +=
-            '$elementName.append(_i2.Text("""${element.text}"""));';
+        beginningFunc = textNodeRendering(element, beginningFunc, elementName);
       } else {
         // Render elements
         String childname =
@@ -135,25 +126,8 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
           beginningFunc += element.innerHtml;
         } else {
           if (nonDartImports.keys.contains(element.localName)) {
-            var componentItem =
-                '${element.localName}.${'${element.localName!}Component()'}';
-            if (element.attributes.keys
-                .where((element) => (element as String).contains('p-bind'))
-                .isNotEmpty) {
-              var props = element.attributes.entries.where(
-                  (element) => (element.key as String).contains('p-bind'));
-              Map<String, dynamic> params = Map.fromIterables(
-                  props.map((e) => (e.key as String).replaceAll('p-bind:', '')),
-                  props.map((e) => e.value));
-              String paramlist =
-                  params.entries.map((e) => "${e.key}: ${e.value}").join(', ');
-              componentItem =
-                  '${element.localName}.${'${element.localName!}Component($paramlist)'}';
-            }
-            beginningFunc += '''
-final ${childname}component = $componentItem;
-_i2.Element $childname = ${childname}component.render(${childname}component.template!);
-''';
+            beginningFunc =
+                customComponentRendering(element, beginningFunc, childname);
           } else {
             beginningFunc +=
                 "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
@@ -372,7 +346,7 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
         beginningFunc +=
             '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
-    } else {
+    } else if (!phsattr.pheasantAttr.contains(attr.key)) {
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
     }

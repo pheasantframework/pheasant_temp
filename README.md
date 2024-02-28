@@ -9,10 +9,6 @@ This package is used to render content from .phs files into dart template files 
 This resource is not intended for use by the end user or for general use, but mainly for the background/behind-the-scenes working of the Pheasant Framework. 
 It can be used for low-level handling of pheasant file data.
 
-### Some things to note
-
-NOTE: There was a minor mismatch, and changes that were made in the `pheasant_meta` package to complement `pheasant_temp` for version `0.1.0-beta.1` were not reflected in the dependency graph. Therefore, you can either make the fix by overriding pheasant_meta manually to `0.1.0-beta.1`, or by not using version `0.1.0-beta.1` of this package and use `0.1.0-beta.2` instead.
-
 This package is constantly under development, and may not be perfect. If you have any issues with this package, or any packages that depend on it because of this package, please feel free to raise an issue, and we will work on it. Ensure to [follow the guidelines](./CODE_OF_CONDUCT.md), though. 
 
 If you have any contributions to make, feel free, just [follow the contribution guidelines](./CONTRIBUTING.md), and make your contributions as guided. All contributions concerning this package are welcome and are reviewed in order to constantly give performant features.

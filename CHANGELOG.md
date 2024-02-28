@@ -1,3 +1,8 @@
+## 0.1.0-dev.1
+- Fixed State Tree 
+- Added new state features for state tree fix.
+- Fixed some minor attribute issues.
+
 ## 0.1.0-dev
 - Started support for JS (JS into Dart) via normal JS Interop (if you want to use other features, please import the normal imports).
 - Fixed issues concerning external function extraction and custom components (did not take attributes into consideration).
