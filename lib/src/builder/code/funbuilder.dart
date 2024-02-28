@@ -51,12 +51,12 @@ Code renderRenderFunc(
   if (pheasant.errors.isNotEmpty &&
       pheasant.errors.map((e) => e.message).where((element) {
         return (!element.contains('solidus not allowed on element') &&
-            !element.contains('Expected DOCTYPE'));
+            !element.contains('Expected DOCTYPE') && !element.contains("End tag (div) seen too early. Expected other end tag."));
       }).isNotEmpty) {
     print(
         '''Issues Parsing Template Data: ${pheasant.errors.map((e) => e.message).where((element) {
       return (!element.contains('solidus not allowed on element') &&
-          !element.contains('Expected DOCTYPE'));
+          !element.contains('Expected DOCTYPE')  && !element.contains("End tag (div) seen too early. Expected other end tag."));
     })}''');
   }
   // Create the element via parsing
