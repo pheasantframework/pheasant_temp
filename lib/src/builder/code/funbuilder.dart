@@ -26,7 +26,7 @@ Code renderRenderFunc(
     final String appDirPath = 'lib',
     bool sass = false}) {
   String beginningFunc = '''
-
+init();
 ''';
   // Perform String concatenation switch
   // This renders interpolation
