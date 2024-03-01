@@ -11,6 +11,7 @@
 library pheasant_build;
 
 export 'src/base.dart';
+export 'src/components/custom/custom.dart';
 export 'src/state/state.dart'
     hide
         StateTarget,
