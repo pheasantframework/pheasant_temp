@@ -368,6 +368,11 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
     } else if (!phsattr.pheasantAttr.contains(attr.key)) {
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
+    } else if (
+      !checkValid(pheasantHtml.localName!) 
+      && !nonDartImports.keys.contains(pheasantHtml.localName)
+    ) {
+      beginningFunc += '''${elementName}component[${attr.key as String}](${attr.value}, $elementName)''';
     }
     if (pheasantHtml.localName == 'input' &&
         (attr.key as String).contains('@')) {
@@ -379,12 +384,6 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
           ''' ${(attr.key as String).replaceFirst('@', '')} = ($elementName as _i2.InputElement).value ?? '';
       });''';
       beginningFunc += data;
-    }
-    if (
-      !checkValid(pheasantHtml.localName!) 
-      && !nonDartImports.keys.contains(pheasantHtml.localName)
-    ) {
-      // beginningFunc += ;
     }
   }
   if (styleScoped != null && styleScoped.scoped) {
