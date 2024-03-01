@@ -1,9 +1,16 @@
 import 'package:html/dom.dart' show Element;
 
 String customComponentRendering(
-    Element element, String beginningFunc, String childname) {
+    Element element, String beginningFunc, String childname, {
+      String? overrideName
+    }
+  ) {
+    String componentName = '${element.localName!}Component()';
+    if (overrideName != null) {
+      componentName = '$overrideName()';
+    }
   var componentItem =
-      '${element.localName}.${'${element.localName!}Component()'}';
+      '${element.localName}.$componentName';
   if (element.attributes.keys
       .where((element) => (element as String).contains('p-bind'))
       .isNotEmpty) {
