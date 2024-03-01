@@ -3,9 +3,10 @@ import 'package:html/dom.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart'
     show PheasantStyle, PheasantStyleScoped;
-import 'package:pheasant_temp/src/builder/code/src/utils/custom_element.dart';
-import 'package:pheasant_temp/src/builder/code/src/utils/text_node.dart';
 
+import 'utils/custom_element.dart';
+import 'utils/text_node.dart';
+import '../../../components/elements/tags.dart';
 import '../constants/defs.dart';
 import 'events.dart';
 import '../constants/lists.dart' as phsattr;
@@ -36,9 +37,10 @@ String renderElement(
     String beginningFunc, Element? pheasantHtml, Iterable<String> attrmap,
     {String elementName = 'element',
     Map<String, String> nonDartImports = const {},
+    String? componentName,
     PheasantStyleScoped? pheasantStyleScoped}) {
   beginningFunc = basicAttributes(pheasantHtml, beginningFunc,
-      elementName: elementName, styleScoped: pheasantStyleScoped);
+      elementName: elementName, styleScoped: pheasantStyleScoped, nonDartImports: nonDartImports);
   int closebracket = 0;
   // Render attributes
   final tempobj = pheasantAttributes(
@@ -46,7 +48,7 @@ String renderElement(
       attrmap: attrmap,
       beginningFunc,
       closebracket,
-      elementName: elementName);
+      elementName: elementName,);
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
   // Add children
@@ -95,7 +97,7 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
 /// IF the custom component contains children, then this is passed to the `slot`s defined in the custom component.
 String attachChildren(Element? pheasantHtml, String beginningFunc,
     {String Function(String, Element?, Iterable<String>,
-            {String elementName, Map<String, String> nonDartImports})
+            {String elementName, Map<String, String> nonDartImports, String? componentName})
         childFun = renderElement,
     String elementName = 'element',
     Map<String, String> nonDartImports = const {},
@@ -125,17 +127,26 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
         } else if (element.localName == 'action') {
           beginningFunc += element.innerHtml;
         } else {
-          if (nonDartImports.keys.contains(element.localName)) {
-            beginningFunc =
-                customComponentRendering(element, beginningFunc, childname);
-          } else {
+          String? overrideName;
+          String childstrFunc = "";
+          if (checkValid(element.localName!)) {
             beginningFunc +=
                 "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
-          }
-          String childstrFunc = "";
-          childstrFunc = childFun(childstrFunc, element,
+            childstrFunc = childFun(childstrFunc, element,
               PheasantAttribute.values.map((e) => e.name),
               elementName: childname, nonDartImports: nonDartImports);
+          } else {
+            if (nonDartImports.keys.contains(element.localName)) {
+              overrideName = null;
+            } else {
+              overrideName = element.localName!;
+            }
+            beginningFunc =
+                customComponentRendering(element, beginningFunc, childname, overrideName: overrideName);
+            childstrFunc = childFun(childstrFunc, element,
+              PheasantAttribute.values.map((e) => e.name),
+              elementName: childname, nonDartImports: nonDartImports, componentName: overrideName == null ? '${element.localName!}Component()' : '$overrideName()');
+          }
           beginningFunc += childstrFunc;
           if (nonDartImports.keys.contains(element.parent!.localName)) {
             if (element.attributes.keys
@@ -149,6 +160,14 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
             }
           } else {
             beginningFunc += '$elementName.children.add($childname);';
+          }
+          if (!checkValid(element.localName!)) {
+            beginningFunc += '''$childname.parent?.on['DOMNodeRemoved'].listen((event) {
+              var removedNode = event.target;
+              if (removedNode == $childname) {
+                ${childname}component.del();
+              }
+            });''';
           }
         }
       }
@@ -329,7 +348,7 @@ PheasantTC pheasantBasicAttributes(
 ///
 /// It also specially renderes certain attributes like `p-attach`, `p-bind`, `preventDefault(s)` and more.
 String basicAttributes(Element? pheasantHtml, String beginningFunc,
-    {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
+    {String elementName = 'element', PheasantStyleScoped? styleScoped, Map<String, String> nonDartImports = const {}, String? componentName}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (phsattr.className.contains(attr.key)) {
       beginningFunc += '$elementName.classes.add("${attr.value}");';
@@ -360,6 +379,12 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
           ''' ${(attr.key as String).replaceFirst('@', '')} = ($elementName as _i2.InputElement).value ?? '';
       });''';
       beginningFunc += data;
+    }
+    if (
+      !checkValid(pheasantHtml.localName!) 
+      && !nonDartImports.keys.contains(pheasantHtml.localName)
+    ) {
+      // beginningFunc += ;
     }
   }
   if (styleScoped != null && styleScoped.scoped) {
