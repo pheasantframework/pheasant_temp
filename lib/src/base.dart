@@ -1,7 +1,5 @@
 import 'dart:html' show Element;
 
-import 'package:pheasant_meta/pheasant_meta.dart' show From;
-
 import 'state/state.dart' show TemplateState;
 
 /// The base class for all Pheasant App Components
