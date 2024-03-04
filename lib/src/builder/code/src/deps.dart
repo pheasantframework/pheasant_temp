@@ -38,7 +38,10 @@ String renderElement(
     {String elementName = 'element',
     Map<String, String> nonDartImports = const {},
     String? componentName,
-    PheasantStyleScoped? pheasantStyleScoped}) {
+    PheasantStyleScoped? pheasantStyleScoped,
+    List<String> dartImportAliases = const [],
+    List<String> dartImportShows = const []
+    }) {
   beginningFunc = basicAttributes(pheasantHtml, beginningFunc,
       elementName: elementName, styleScoped: pheasantStyleScoped, nonDartImports: nonDartImports);
   int closebracket = 0;
@@ -53,7 +56,7 @@ String renderElement(
   closebracket = tempobj.number;
   // Add children
   beginningFunc = attachChildren(pheasantHtml, beginningFunc,
-      elementName: elementName, nonDartImports: nonDartImports);
+      elementName: elementName, nonDartImports: nonDartImports, dartImports: dartImportAliases);
 
   // Add remaining closed braces to close up scope and render valid dart code
   beginningFunc += ('}\n' * closebracket);
@@ -97,10 +100,12 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
 /// IF the custom component contains children, then this is passed to the `slot`s defined in the custom component.
 String attachChildren(Element? pheasantHtml, String beginningFunc,
     {String Function(String, Element?, Iterable<String>,
-            {String elementName, Map<String, String> nonDartImports, String? componentName})
+            {String elementName, Map<String, String> nonDartImports, String? componentName, List<String> dartImportAliases, List<String> dartImportShows})
         childFun = renderElement,
     String elementName = 'element',
     Map<String, String> nonDartImports = const {},
+    List<String> dartImports = const [],
+    List<String> shownDartImports = const [],
     PheasantStyleScoped? pheasantStyleScoped,
     Iterable<String> attrmap = const []}) {
   // Ensure that children exist before running code
@@ -136,19 +141,24 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
               PheasantAttribute.values.map((e) => e.name),
               elementName: childname, nonDartImports: nonDartImports);
           } else {
+            String? importDef;
             if (nonDartImports.keys.contains(element.localName)) {
               overrideName = null;
             } else {
               overrideName = element.localName!;
+              if (dartImports.contains(overrideName)) {
+                importDef = overrideName;
+              }
             }
             beginningFunc =
-                customComponentRendering(element, beginningFunc, childname, overrideName: overrideName);
+                customComponentRendering(element, beginningFunc, childname, overrideName: overrideName, imported: importDef != null, importName: importDef);
+            
             childstrFunc = childFun(childstrFunc, element,
               PheasantAttribute.values.map((e) => e.name),
-              elementName: childname, nonDartImports: nonDartImports, componentName: overrideName == null ? '${element.localName!}Component()' : '$overrideName()');
+              elementName: childname, nonDartImports: nonDartImports, componentName: overrideName == null ? '${element.localName!}Component()' : '$overrideName()', dartImportAliases: dartImports);
           }
           beginningFunc += childstrFunc;
-          if (nonDartImports.keys.contains(element.parent!.localName)) {
+          if (!checkValid(element.parent!.localName!)) {
             if (element.attributes.keys
                 .where((object) => (object as String).contains('p-slot'))
                 .isNotEmpty) {
@@ -159,15 +169,7 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
                   "$elementName.querySelector('slot')?.children.add($childname);";
             }
           } else {
-            beginningFunc += '$elementName.children.add($childname);';
-          }
-          if (!checkValid(element.localName!)) {
-            beginningFunc += '''$childname.parent?.on['DOMNodeRemoved'].listen((event) {
-              var removedNode = event.target;
-              if (removedNode == $childname) {
-                ${childname}component.del();
-              }
-            });''';
+              beginningFunc += '$elementName.children.add($childname);';
           }
         }
       }
