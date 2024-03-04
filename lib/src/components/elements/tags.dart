@@ -179,8 +179,6 @@ List<String> _additionalHtmlTags = [
   'xmp',
 ];
 
-
-
 bool checkValid(String name) {
   return _htmlTags.contains(name);
 }

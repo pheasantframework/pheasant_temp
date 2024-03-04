@@ -45,12 +45,12 @@ abstract class PheasantTemplate {
 
   PheasantTemplate({required this.template});
 
-  /// Function used to declare the initial state/case of a component. 
-  /// 
+  /// Function used to declare the initial state/case of a component.
+  ///
   /// This function is called at the beginning of rendering, once the application is added to the DOM.
   void init() {}
 
-  /// Function used to declare the final state of a component. 
+  /// Function used to declare the final state of a component.
   /// This function is called at the end of the component's life cycle, either when removed from the DOM or navigating to another page
   void del() {}
 

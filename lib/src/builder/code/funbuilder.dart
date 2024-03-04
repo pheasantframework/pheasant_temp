@@ -51,12 +51,16 @@ init();
   if (pheasant.errors.isNotEmpty &&
       pheasant.errors.map((e) => e.message).where((element) {
         return (!element.contains('solidus not allowed on element') &&
-            !element.contains('Expected DOCTYPE') && !element.contains("End tag (div) seen too early. Expected other end tag."));
+            !element.contains('Expected DOCTYPE') &&
+            !element.contains(
+                "End tag (div) seen too early. Expected other end tag."));
       }).isNotEmpty) {
     print(
         '''Issues Parsing Template Data: ${pheasant.errors.map((e) => e.message).where((element) {
       return (!element.contains('solidus not allowed on element') &&
-          !element.contains('Expected DOCTYPE')  && !element.contains("End tag (div) seen too early. Expected other end tag."));
+          !element.contains('Expected DOCTYPE') &&
+          !element.contains(
+              "End tag (div) seen too early. Expected other end tag."));
     })}''');
   }
   // Create the element via parsing
@@ -88,7 +92,11 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
       for (var element in pheasantScript.nonDartImports)
         (element).as!: (element).url
     };
-    List<String> dartImportAliases = pheasantScript.imports.where((element) => fileExtension(element.url) == 'dart').map((e) => e.show).join(" ").split(" ");
+    List<String> dartImportAliases = pheasantScript.imports
+        .where((element) => fileExtension(element.url) == 'dart')
+        .map((e) => e.show)
+        .join(" ")
+        .split(" ");
     formatCustomComponents(importMap, template, pheasantHtml);
     // Work on pheasant attributes
     Iterable<String> attrmap = PheasantAttribute.values.map((e) => e.name);
@@ -97,7 +105,9 @@ final PheasantHtml = _i1.parse(body).body!.children.first;
     beginningFunc = styleElement(beginningFunc, scopedStyle, 'element');
 
     beginningFunc = renderElement(beginningFunc, pheasantHtml, attrmap,
-        nonDartImports: importMap, pheasantStyleScoped: scopedStyle, dartImportAliases: dartImportAliases);
+        nonDartImports: importMap,
+        pheasantStyleScoped: scopedStyle,
+        dartImportAliases: dartImportAliases);
   }
   // Final Line
   beginningFunc += 'return element;';

@@ -27,8 +27,6 @@ abstract class PheasantComponent extends PheasantTemplate {
   Element _render([TemplateState? state]) {
     return renderComponent(state);
   }
-  
 }
-
 
 typedef AttrFunc = void Function(String value, Element target);

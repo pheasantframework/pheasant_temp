@@ -40,23 +40,27 @@ String renderElement(
     String? componentName,
     PheasantStyleScoped? pheasantStyleScoped,
     List<String> dartImportAliases = const [],
-    List<String> dartImportShows = const []
-    }) {
+    List<String> dartImportShows = const []}) {
   beginningFunc = basicAttributes(pheasantHtml, beginningFunc,
-      elementName: elementName, styleScoped: pheasantStyleScoped, nonDartImports: nonDartImports);
+      elementName: elementName,
+      styleScoped: pheasantStyleScoped,
+      nonDartImports: nonDartImports);
   int closebracket = 0;
   // Render attributes
   final tempobj = pheasantAttributes(
-      pheasantHtml,
-      attrmap: attrmap,
-      beginningFunc,
-      closebracket,
-      elementName: elementName,);
+    pheasantHtml,
+    attrmap: attrmap,
+    beginningFunc,
+    closebracket,
+    elementName: elementName,
+  );
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
   // Add children
   beginningFunc = attachChildren(pheasantHtml, beginningFunc,
-      elementName: elementName, nonDartImports: nonDartImports, dartImports: dartImportAliases);
+      elementName: elementName,
+      nonDartImports: nonDartImports,
+      dartImports: dartImportAliases);
 
   // Add remaining closed braces to close up scope and render valid dart code
   beginningFunc += ('}\n' * closebracket);
@@ -100,7 +104,11 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
 /// IF the custom component contains children, then this is passed to the `slot`s defined in the custom component.
 String attachChildren(Element? pheasantHtml, String beginningFunc,
     {String Function(String, Element?, Iterable<String>,
-            {String elementName, Map<String, String> nonDartImports, String? componentName, List<String> dartImportAliases, List<String> dartImportShows})
+            {String elementName,
+            Map<String, String> nonDartImports,
+            String? componentName,
+            List<String> dartImportAliases,
+            List<String> dartImportShows})
         childFun = renderElement,
     String elementName = 'element',
     Map<String, String> nonDartImports = const {},
@@ -138,8 +146,8 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
             beginningFunc +=
                 "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
             childstrFunc = childFun(childstrFunc, element,
-              PheasantAttribute.values.map((e) => e.name),
-              elementName: childname, nonDartImports: nonDartImports);
+                PheasantAttribute.values.map((e) => e.name),
+                elementName: childname, nonDartImports: nonDartImports);
           } else {
             String? importDef;
             if (nonDartImports.keys.contains(element.localName)) {
@@ -150,12 +158,20 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
                 importDef = overrideName;
               }
             }
-            beginningFunc =
-                customComponentRendering(element, beginningFunc, childname, overrideName: overrideName, imported: importDef != null, importName: importDef);
-            
+            beginningFunc = customComponentRendering(
+                element, beginningFunc, childname,
+                overrideName: overrideName,
+                imported: importDef != null,
+                importName: importDef);
+
             childstrFunc = childFun(childstrFunc, element,
-              PheasantAttribute.values.map((e) => e.name),
-              elementName: childname, nonDartImports: nonDartImports, componentName: overrideName == null ? '${element.localName!}Component()' : '$overrideName()', dartImportAliases: dartImports);
+                PheasantAttribute.values.map((e) => e.name),
+                elementName: childname,
+                nonDartImports: nonDartImports,
+                componentName: overrideName == null
+                    ? '${element.localName!}Component()'
+                    : '$overrideName()',
+                dartImportAliases: dartImports);
           }
           beginningFunc += childstrFunc;
           if (!checkValid(element.parent!.localName!)) {
@@ -169,7 +185,7 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
                   "$elementName.querySelector('slot')?.children.add($childname);";
             }
           } else {
-              beginningFunc += '$elementName.children.add($childname);';
+            beginningFunc += '$elementName.children.add($childname);';
           }
         }
       }
@@ -350,7 +366,10 @@ PheasantTC pheasantBasicAttributes(
 ///
 /// It also specially renderes certain attributes like `p-attach`, `p-bind`, `preventDefault(s)` and more.
 String basicAttributes(Element? pheasantHtml, String beginningFunc,
-    {String elementName = 'element', PheasantStyleScoped? styleScoped, Map<String, String> nonDartImports = const {}, String? componentName}) {
+    {String elementName = 'element',
+    PheasantStyleScoped? styleScoped,
+    Map<String, String> nonDartImports = const {},
+    String? componentName}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (phsattr.className.contains(attr.key)) {
       beginningFunc += '$elementName.classes.add("${attr.value}");';
@@ -370,11 +389,10 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
     } else if (!phsattr.pheasantAttr.contains(attr.key)) {
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
-    } else if (
-      !checkValid(pheasantHtml.localName!) 
-      && !nonDartImports.keys.contains(pheasantHtml.localName)
-    ) {
-      beginningFunc += '''${elementName}component[${attr.key as String}](${attr.value}, $elementName)''';
+    } else if (!checkValid(pheasantHtml.localName!) &&
+        !nonDartImports.keys.contains(pheasantHtml.localName)) {
+      beginningFunc +=
+          '''${elementName}component[${attr.key as String}](${attr.value}, $elementName)''';
     }
     if (pheasantHtml.localName == 'input' &&
         (attr.key as String).contains('@')) {
