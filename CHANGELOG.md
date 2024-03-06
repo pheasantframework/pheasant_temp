@@ -1,3 +1,6 @@
+## 0.1.0-tested
+- Implemented tests.
+
 ## 0.1.0-extended
 - Added support for custom components
 
