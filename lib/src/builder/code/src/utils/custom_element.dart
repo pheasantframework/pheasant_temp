@@ -1,9 +1,15 @@
 import 'package:html/dom.dart' show Element;
 
 String customComponentRendering(
-    Element element, String beginningFunc, String childname) {
+    Element element, String beginningFunc, String childname,
+    {String? overrideName, bool imported = true, String? importName}) {
+  String impName = importName ?? element.localName!;
+  String componentName = '${element.localName!}Component';
+  if (overrideName != null) {
+    componentName = overrideName;
+  }
   var componentItem =
-      '${element.localName}.${'${element.localName!}Component()'}';
+      '${imported || overrideName == null ? '$impName.' : ''}$componentName()';
   if (element.attributes.keys
       .where((element) => (element as String).contains('p-bind'))
       .isNotEmpty) {
@@ -14,8 +20,9 @@ String customComponentRendering(
         props.map((e) => e.value));
     String paramlist =
         params.entries.map((e) => "${e.key}: ${e.value}").join(', ');
+
     componentItem =
-        '${element.localName}.${'${element.localName!}Component($paramlist)'}';
+        '${imported || overrideName == null ? '$impName.' : ''}$componentName($paramlist)';
   }
   beginningFunc += '''
   final ${childname}component = $componentItem;

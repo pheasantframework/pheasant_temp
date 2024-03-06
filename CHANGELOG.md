@@ -1,3 +1,6 @@
+## 0.1.0-extended
+- Added support for custom components
+
 ## 0.1.0-dev.1
 - Fixed State Tree 
 - Added new state features for state tree fix.
