@@ -1,8 +1,12 @@
 import 'package:html/dom.dart' show Element, Text;
+import 'package:html/dom.dart';
 import 'package:markdown/markdown.dart' show markdownToHtml;
 import 'package:pheasant_assets/pheasant_assets.dart'
     show PheasantStyle, PheasantStyleScoped;
 
+import 'utils/custom_element.dart';
+import 'utils/text_node.dart';
+import '../../../components/elements/tags.dart';
 import '../constants/defs.dart';
 import 'events.dart';
 import '../constants/lists.dart' as phsattr;
@@ -33,22 +37,30 @@ String renderElement(
     String beginningFunc, Element? pheasantHtml, Iterable<String> attrmap,
     {String elementName = 'element',
     Map<String, String> nonDartImports = const {},
-    PheasantStyleScoped? pheasantStyleScoped}) {
+    String? componentName,
+    PheasantStyleScoped? pheasantStyleScoped,
+    List<String> dartImportAliases = const [],
+    List<String> dartImportShows = const []}) {
   beginningFunc = basicAttributes(pheasantHtml, beginningFunc,
-      elementName: elementName, styleScoped: pheasantStyleScoped);
+      elementName: elementName,
+      styleScoped: pheasantStyleScoped,
+      nonDartImports: nonDartImports);
   int closebracket = 0;
   // Render attributes
   final tempobj = pheasantAttributes(
-      pheasantHtml,
-      attrmap: attrmap,
-      beginningFunc,
-      closebracket,
-      elementName: elementName);
+    pheasantHtml,
+    attrmap: attrmap,
+    beginningFunc,
+    closebracket,
+    elementName: elementName,
+  );
   beginningFunc = tempobj.value;
   closebracket = tempobj.number;
   // Add children
   beginningFunc = attachChildren(pheasantHtml, beginningFunc,
-      elementName: elementName, nonDartImports: nonDartImports);
+      elementName: elementName,
+      nonDartImports: nonDartImports,
+      dartImports: dartImportAliases);
 
   // Add remaining closed braces to close up scope and render valid dart code
   beginningFunc += ('}\n' * closebracket);
@@ -92,10 +104,16 @@ _i2.StyleElement $styleElementName = _i2.StyleElement()
 /// IF the custom component contains children, then this is passed to the `slot`s defined in the custom component.
 String attachChildren(Element? pheasantHtml, String beginningFunc,
     {String Function(String, Element?, Iterable<String>,
-            {String elementName, Map<String, String> nonDartImports})
+            {String elementName,
+            Map<String, String> nonDartImports,
+            String? componentName,
+            List<String> dartImportAliases,
+            List<String> dartImportShows})
         childFun = renderElement,
     String elementName = 'element',
     Map<String, String> nonDartImports = const {},
+    List<String> dartImports = const [],
+    List<String> shownDartImports = const [],
     PheasantStyleScoped? pheasantStyleScoped,
     Iterable<String> attrmap = const []}) {
   // Ensure that children exist before running code
@@ -107,19 +125,7 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
           pheasantHtml.nodes.last == element) {
       } else if (element.nodeType == 3) {
         // Render text nodes
-        if ((element.text ?? '').contains(RegExp(r'\{\{([^\}]+)\}\}'))) {
-          // Remove interpolation and add desired value
-          final regex = RegExp(r'\{\{([^\}]+)\}\}');
-          Match match = regex.allMatches(element.text ?? '').first;
-          element.text = '\${${match[1]}}';
-        } else if ((element.text ?? '').contains(RegExp(r'\{([^\}]+)\}'))) {
-          // Remove interpolation and add desired value
-          final regex = RegExp(r'\{([^\}]+)\}');
-          Match match = regex.allMatches(element.text ?? '').first;
-          element.text = '\${${match[1]}}';
-        }
-        beginningFunc +=
-            '$elementName.append(_i2.Text("""${element.text}"""));';
+        beginningFunc = textNodeRendering(element, beginningFunc, elementName);
       } else {
         // Render elements
         String childname =
@@ -134,36 +140,41 @@ String attachChildren(Element? pheasantHtml, String beginningFunc,
         } else if (element.localName == 'action') {
           beginningFunc += element.innerHtml;
         } else {
-          if (nonDartImports.keys.contains(element.localName)) {
-            var componentItem =
-                '${element.localName}.${'${element.localName!}Component()'}';
-            if (element.attributes.keys
-                .where((element) => (element as String).contains('p-bind'))
-                .isNotEmpty) {
-              var props = element.attributes.entries.where(
-                  (element) => (element.key as String).contains('p-bind'));
-              Map<String, dynamic> params = Map.fromIterables(
-                  props.map((e) => (e.key as String).replaceAll('p-bind:', '')),
-                  props.map((e) => e.value));
-              String paramlist =
-                  params.entries.map((e) => "${e.key}: ${e.value}").join(', ');
-              componentItem =
-                  '${element.localName}.${'${element.localName!}Component($paramlist)'}';
-            }
-            beginningFunc += '''
-final ${childname}component = $componentItem;
-_i2.Element $childname = ${childname}component.render(${childname}component.template!);
-''';
-          } else {
+          String? overrideName;
+          String childstrFunc = "";
+          if (checkValid(element.localName!)) {
             beginningFunc +=
                 "_i2.Element $childname = _i2.Element.tag('${(element).localName}');";
+            childstrFunc = childFun(childstrFunc, element,
+                PheasantAttribute.values.map((e) => e.name),
+                elementName: childname, nonDartImports: nonDartImports);
+          } else {
+            String? importDef;
+            if (nonDartImports.keys.contains(element.localName)) {
+              overrideName = null;
+            } else {
+              overrideName = element.localName!;
+              if (dartImports.contains(overrideName)) {
+                importDef = overrideName;
+              }
+            }
+            beginningFunc = customComponentRendering(
+                element, beginningFunc, childname,
+                overrideName: overrideName,
+                imported: importDef != null,
+                importName: importDef);
+
+            childstrFunc = childFun(childstrFunc, element,
+                PheasantAttribute.values.map((e) => e.name),
+                elementName: childname,
+                nonDartImports: nonDartImports,
+                componentName: overrideName == null
+                    ? '${element.localName!}Component()'
+                    : '$overrideName()',
+                dartImportAliases: dartImports);
           }
-          String childstrFunc = "";
-          childstrFunc = childFun(childstrFunc, element,
-              PheasantAttribute.values.map((e) => e.name),
-              elementName: childname, nonDartImports: nonDartImports);
           beginningFunc += childstrFunc;
-          if (nonDartImports.keys.contains(element.parent!.localName)) {
+          if (!checkValid(element.parent!.localName!)) {
             if (element.attributes.keys
                 .where((object) => (object as String).contains('p-slot'))
                 .isNotEmpty) {
@@ -355,7 +366,10 @@ PheasantTC pheasantBasicAttributes(
 ///
 /// It also specially renderes certain attributes like `p-attach`, `p-bind`, `preventDefault(s)` and more.
 String basicAttributes(Element? pheasantHtml, String beginningFunc,
-    {String elementName = 'element', PheasantStyleScoped? styleScoped}) {
+    {String elementName = 'element',
+    PheasantStyleScoped? styleScoped,
+    Map<String, String> nonDartImports = const {},
+    String? componentName}) {
   for (var attr in pheasantHtml!.attributes.entries) {
     if (phsattr.className.contains(attr.key)) {
       beginningFunc += '$elementName.classes.add("${attr.value}");';
@@ -372,9 +386,13 @@ String basicAttributes(Element? pheasantHtml, String beginningFunc,
         beginningFunc +=
             '$elementName.setAttribute("${(attr.key as String).replaceAll('p-attach:', '')}", "\${${attr.value}}");';
       }
-    } else {
+    } else if (!phsattr.pheasantAttr.contains(attr.key)) {
       beginningFunc +=
           '$elementName.setAttribute("${attr.key as String}", "${attr.value}");';
+    } else if (!checkValid(pheasantHtml.localName!) &&
+        !nonDartImports.keys.contains(pheasantHtml.localName)) {
+      beginningFunc +=
+          '''${elementName}component[${attr.key as String}](${attr.value}, $elementName)''';
     }
     if (pheasantHtml.localName == 'input' &&
         (attr.key as String).contains('@')) {

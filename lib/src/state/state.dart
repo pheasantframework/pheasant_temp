@@ -1,12 +1,12 @@
 import 'dart:async' show Future, Stream, StreamController;
-import 'dart:html' show Event;
+import 'dart:html' show Event, Element;
 
 import 'package:pheasant_meta/pheasant_meta.dart'
     show From, PheasantUnimplementedError;
 
 import '../base.dart';
 
-// TODO: Figuree out how to control state in child components
+// TODO: Figuree out how to completely control state in child components
 
 /// Mixin for base definition of state control functions.
 ///
@@ -365,15 +365,61 @@ class ChangeWatcher<T>
   }
 }
 
+/// Mixin for the new [ElementChangeWatcher] object, an object specifically used for changes between parent and children in [PheasantTemplate] objects.
+///
+/// This mixin holds the functionality of storing and releasing the state of the object through the [Element.replaceWith] function.
+mixin HtmlElementStateControl {
+  /// The current reference to the element rendered by the component being watched by the [ChangeWatcher].
+  Element? _reference;
+
+  /// The initial reference to the element rendered by the component being watched by the [ChangeWatcher].
+  Element? _initialRef;
+
+  /// Function used to initialise the element reference.
+  void initialiseReference(Element element) {
+    _initialRef = element;
+  }
+
+  /// Function used to set the current element reference, used to measure state.
+  void setReference(Element element) {
+    _reference = element;
+  }
+
+  /// Function called after a state change made by the parent to reproduce the current state of the element.
+  ///
+  /// In future versions, the functionality here may be replaced by a [State] object on [Element].
+  void reflectChanges() {
+    if (_reference != null) _initialRef?.replaceWith(_reference!);
+  }
+}
+
+/// A special extended class of [ChangeWatcher] used to control the state of not only the [PheasantTemplate] object, but the [Element] rendered by the file.
+///
+/// When a state change is caused by the parent, it could refresh the changes on the [PheasantTemplate] file, including the changes made on the [Element] and its children elements rendered by the object.
+///
+/// In order to store and reproduce these changes, the [ElementChangeWatcher] object has added functionality by the [HtmlElementStateControl] mixin to be able to control the state of children elements that will undergo these state changes.
+class ElementChangeWatcher<U extends PheasantTemplate> extends ChangeWatcher<U>
+    with HtmlElementStateControl {
+  ElementChangeWatcher({required U initValue, State<U>? state})
+      : super(initValue: initValue, state: state);
+}
+
 /// The class used in Pheasant Template Components. This class extends the base class [ElementState] with functionality used directly in controlling state in an application.
 ///
 /// In every pheasant state object, there is an emitter - [ChangeEmitter] - and a receiver [ChangeReceiver] - used in receiving and emitting changes.
 ///
 /// This object has the ability to do most of the state functionality that can be done in an [ElementState] or [StateObject] object, but has a few additional functions like [emit] and [receive].
 class TemplateState extends ElementState<PheasantTemplate> {
+  /// The watchers used to watch changes in an application.
+  List<ChangeWatcher> watchers = [];
+
+  /// Constructor to create a [TemplateState] object.
+  ///
+  /// Ensure to pass [watchers] as a growable list - [List.empty] for instance - else watchers would not be able to be registered.
   TemplateState(
       {required super.component,
       PheasantTemplate? initState,
+      this.watchers = const <ChangeWatcher>[],
       this.disposeState})
       : initState = initState ?? component,
         emitter = ChangeEmitter(),
@@ -393,12 +439,28 @@ class TemplateState extends ElementState<PheasantTemplate> {
   ChangeEmitter emitter;
   ChangeReceiver receiver;
 
+  void _streamChange(PheasantTemplate? templateChange,
+      StateChange<PheasantTemplate> newChange) {
+    if (!_frozen) {
+      if (templateChange != null) componentState.change(templateChange);
+      _stateController.add(newChange);
+    }
+  }
+
   /// Function used to emit state changes in a [PheasantTemplate] object.
   ///
   /// This function creates, emits and registers a [StateChange] by making use of [event] and [templateState].
   ///
   /// The function then registers the change and adds it to the [Stream].
-  void emit(Event event, {PheasantTemplate? templateState}) {}
+  void emit(Event event, {PheasantTemplate? templateState}) {
+    if (!_frozen) {
+      StateChange<PheasantTemplate> change = StateChange(
+          triggerEvent: event, newValue: templateState); // Set state change
+      emitter.emit(); // Unimplemented yet
+      _streamChange(templateState, change);
+      receiver.receive(); // Unimplemented yet
+    }
+  }
 
   /// Function used to receive state changes in a [PheasantTemplate] object.
   void receive<T>(StateChange stateChange, T refVariable) {}
@@ -407,6 +469,18 @@ class TemplateState extends ElementState<PheasantTemplate> {
   void dispose() {
     if (disposeState != null) component = disposeState!;
     super.dispose();
+  }
+
+  /// Function used to register and add a [ChangeWatcher] for the application
+  void registerWatcher<T>(State<T> variableState, T variable,
+      {ChangeWatcher<T>? watcher}) {
+    watchers.add(
+        watcher ?? ChangeWatcher<T>(initValue: variable, state: variableState));
+  }
+
+  /// Function used to remove a [ChangeWatcher]
+  void removeWatcher<T>(ChangeWatcher watcher, {T? reference}) {
+    watchers.removeWhere((element) => element == watcher);
   }
 }
 
@@ -428,11 +502,12 @@ class AppState extends TemplateState {
   State<PheasantTemplate> get currentState => componentState;
 
   /// The watchers used to watch changes in an application.
-  List<ChangeWatcher> watchers = [];
+  @override
+  List<ChangeWatcher> get watchers;
 
   AppState(
       {required PheasantTemplate component,
-      this.watchers = const [],
+      List<ChangeWatcher> watchers = const [],
       PheasantTemplate? initState,
       PheasantTemplate? disposeState})
       : componentState = StateObject(initValue: component),
@@ -440,6 +515,7 @@ class AppState extends TemplateState {
         super(
             initState: initState,
             component: component,
+            watchers: watchers,
             disposeState: disposeState);
 
   /// The current state change in an application
@@ -450,12 +526,13 @@ class AppState extends TemplateState {
   Stream<StateChange<PheasantTemplate>> get stateStream =>
       _stateController.stream;
 
-  void streamChange(PheasantTemplate? templateChange,
+  @override
+  void _streamChange(PheasantTemplate? templateChange,
       StateChange<PheasantTemplate> newChange) {
     if (!_frozen) {
       if (templateChange != null) componentState.change(templateChange);
-      _stateChange = newChange;
       _stateController.add(newChange);
+      _stateChange = newChange;
     }
   }
 
@@ -465,21 +542,9 @@ class AppState extends TemplateState {
       StateChange<PheasantTemplate> change = StateChange(
           triggerEvent: event, newValue: templateState); // Set state change
       emitter.emit(); // Unimplemented yet
-      super.emit(event, templateState: templateState);
-      streamChange(templateState, change);
+      // super.emit(event, templateState: templateState);
+      _streamChange(templateState, change);
     }
-  }
-
-  /// Function used to register and add a [ChangeWatcher] for the application
-  void registerWatcher<T>(State<T> variableState, T variable,
-      {ChangeWatcher<T>? watcher}) {
-    watchers.add(
-        watcher ?? ChangeWatcher<T>(initValue: variable, state: variableState));
-  }
-
-  /// Function used to remove a [ChangeWatcher]
-  void removeWatcher<T>(ChangeWatcher watcher, {T? reference}) {
-    watchers.removeWhere((element) => element == watcher);
   }
 
   @override
