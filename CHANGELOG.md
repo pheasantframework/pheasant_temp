@@ -1,5 +1,6 @@
 ## 0.1.0-tested
 - Implemented tests.
+- Updated Dependency Constraints
 
 ## 0.1.0-extended
 - Added support for custom components
