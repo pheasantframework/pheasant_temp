@@ -11,7 +11,7 @@ build/
 # Mac
 .DS_Store
 
-example/example.dart
+private/
 
 # Directory created by dartdoc
 # If you don't generate documentation locally you can remove this line.
