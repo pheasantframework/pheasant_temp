@@ -1,3 +1,6 @@
+## 0.1.0-extended.1
+- Some minor bug fixes
+
 ## 0.1.0-extended
 - Added support for custom components
 
