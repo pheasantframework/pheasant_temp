@@ -11,6 +11,8 @@ build/
 # Mac
 .DS_Store
 
+private/
+
 example/example.dart
 
 # Directory created by dartdoc
